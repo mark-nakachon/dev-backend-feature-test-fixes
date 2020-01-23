@@ -1,0 +1,11 @@
+INSERT INTO lpc_users(id, tenant_id, username, email, soap_customer_id, points, is_admin) VALUES(20000, 'abcde12345', 'apptest123', 'test@topcoder.com', NULL, 0, true);
+INSERT INTO lpc_users(id, tenant_id, username, email, soap_customer_id, points, is_admin) VALUES(20001, 'abcde12346', 'apptest125', 'test123@topcoder.com', '1111111111111', 0, true);
+INSERT INTO lpc_operations(id, name) VALUES(10000, 'operation1');
+INSERT INTO lpc_operations(id, name) VALUES(10001, 'operation2');
+INSERT INTO lpc_operations(id, name) VALUES(10002, 'operation3');
+INSERT INTO lpc_rules(id, rule, reward, operation_id) VALUES(10000, '{"conditions":{"all":[{"fact":"amount","operator":"greaterThanInclusive","value":10}]}}', 100, 10000);
+INSERT INTO lpc_rules(id, rule, reward, operation_id) VALUES(10001, '{"conditions":{"all":[{"fact":"amount","operator":"greaterThanInclusive","value":20}]}}', 200, 10001);
+INSERT INTO lpc_rules(id, rule, reward, operation_id) VALUES(10002, '{"conditions":{"all":[{"fact":"amount","operator":"greaterThanInclusive","value":30}]}}', 300, 10001);
+INSERT INTO lpc_rules(id, rule, reward, operation_id) VALUES(10003, '{"conditions":{"all":[{"fact":"amount","operator":"greaterThanInclusive","value":40}]}}', 50, 10002);
+INSERT INTO lpc_rules(id, rule, reward, operation_id) VALUES(10004, '{"conditions":{"all":[{"fact":"amount","operator":"greaterThanInclusive","value":50}]}}', 50, 10000);
+INSERT INTO lpc_rules(id, rule, reward, operation_id) VALUES(10005, '{"conditions":{"all":[{"fact":"amount","operator":"greaterThanInclusive","value":60}]}}', 50, 10000);

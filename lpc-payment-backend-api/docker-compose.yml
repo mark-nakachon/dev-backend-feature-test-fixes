@@ -1,0 +1,35 @@
+version: '3'
+services:
+  lpc-backend-api:
+    container_name: lpcBackendApi
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    environment:
+      - SOAP_URL=http://lpc-mock-soap-api:3100/payment?wsdl
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=postgres
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgres
+    links:
+      - 'postgres:postgres'
+      - 'lpc-mock-soap-api:lpc-mock-soap-api'
+    restart: always
+
+  lpc-mock-soap-api:
+    container_name: lpcMockSoapApi
+    build:
+      context: ../__tools__/mocked-soap-api
+
+  postgres:
+    image: postgres
+    restart: always
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_PASSWORD: postgres

@@ -1,0 +1,2602 @@
+openapi: 3.0.0
+info:
+  description: >
+    This is the API for SDK for the Loyalty Payment Card.
+
+
+    All dates are in ISO 8601 format (YYYY-MM-DD). They need to be converted
+    from/to MMDDYYYY when interacting with SOAP.
+
+
+    Pagination for GET requests is controlled via `page` and `per_page` query
+    parameteres and presented via HTTP Headers:
+
+    - `X-Total-Count` – total number of elements, eg. "X-Total-Count: 200". Response for GET requests in `payments` group don't contain this header.
+
+    - `X-Page` – current page, eg. "X-Page: 1"
+
+    - `X-Per-Page` – limit of elements per page, eg. "X-Per-Page: 20"
+
+    - `Link` – link relations to first, last, next and previous pages, eg.
+    "Link: \<https://example.com/api/v1/payments/cards?page=1&per_page=20\>;
+    rel=\"first\",
+    \<https://example.com/api/v1/payments/cards?page=2&per_page=20\>;
+    rel=\"prev\",
+    \<https://example.com/api/v1/payments/cards?page=4&per_page=20\>;
+    rel=\"next\",
+    \<https://example.com/api/v1/payments/cards?page=10&per_page=20\>;
+    rel=\"last\""
+  version: 1.0.0
+  title: Poseidon LPC
+security:
+  - jwt: []
+servers:
+  - url: /api/v1
+tags:
+  - name: payments
+    description: passthrough to the SOAP payment p
+  - name: loyaltyRules
+    description: CRUD operations for loyalty rules
+  - name: loyaltyPoints
+    description: 'CRUD operations, redeem and but for loyalty points'
+paths:
+  /payments/customers:
+    post:
+      tags:
+        - payments
+      operationId: createCustomer
+      summary: Create new customer in NKS
+      description: |
+        **Authorization**: JWT of any logged in user
+        - InstitutionId must exist in CAS
+
+        - BranchId must exist in CAS, if present
+
+        - BirthDate must contain a valid date
+
+        - CustomerType must contain valid value
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerCreate'
+      responses:
+        '201':
+          description: DCSSCustomerCreate completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerCreate'
+        '400':
+          description: >-
+            Address/name field too long or some other
+            fields are invald
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Institution or Branch doesn't exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '409':
+          description: >-
+            User already register as a customer in NKS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conflict'
+        '500':
+          description: >-
+            System Error or Communication error between Webservice and
+            underlying system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  /payments/cards:
+    get:
+      tags:
+        - payments
+      operationId: listCards
+      summary: Returns all card connected to the "input key".
+      description: >
+        **Authorization**: JWT of any logged in user
+
+
+        This web service is PCI compliant if used correctly with the `pcimask`
+
+        attribute. To enable PCI compliant behavior the optional `pcimask`
+
+        header must be set to "true". The Source application needs to be
+
+        approved for PCI compliant processing prior to using this value. When
+
+        using the `pcimask` header with value "true" the service will adhere to
+
+        PCI as follows:
+          - `CardId` and `CardIdVNo` replaces `CardNo` and `VersionNo` as unique key towards a card record
+          - `CardNo` and `VersionNo` may be ommited in requests
+          - Wherever `CardNo` is needed as input, `CardId` shall be used instead
+          - Wherever `VersionNo` not needed as input, `CardIdVNo` shall be used instead
+          - `CardNo` will be masked according to PCI rules in responses
+
+        If WS-consumer is running within a PCI compliant enviroment and
+        `pcimask` is "false" or not present in the request:
+          - `CardNo` and `VersionNo` shall be used as in previous versions of this service
+          - `CardNo` and `VersionNo` is unique key towards a card record
+          - `CardNo` will not be masked in responses
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PerPageParam'
+        - $ref: '#/components/parameters/PCIMaskParam'
+        - $ref: '#/components/parameters/AccountNoParam'
+        - $ref: '#/components/parameters/AccountOwnerParam'
+        - $ref: '#/components/parameters/BranchParam'
+        - $ref: '#/components/parameters/CardIdParam'
+        - $ref: '#/components/parameters/CardIdVNoParam'
+        - $ref: '#/components/parameters/CustomerIdParam'
+        - $ref: '#/components/parameters/CustomerNoParam'
+        - $ref: '#/components/parameters/ExtAgreementIdParam'
+        - $ref: '#/components/parameters/ExternalProductIdParam'
+        - $ref: '#/components/parameters/InstIdParam'
+        - $ref: '#/components/parameters/OptionParam'
+      responses:
+        '200':
+          description: DCSSCardList completed successfully
+          headers:
+            X-Page:
+              $ref: '#/components/parameters/XPageParam'
+            X-Per-Page:
+              $ref: '#/components/parameters/XPerPageParam'
+            Link:
+              $ref: '#/components/parameters/LinkParam'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardList'
+        '400':
+          description: Invalid length of some parameteres
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '500':
+          description: >-
+            System Error or Communication error between Webservice and
+            underlying system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    post:
+      tags:
+        - payments
+      operationId: createCard
+      summary: Creates new card agreement in CAS
+      description: >
+        **Authorization**: JWT of any logged in user
+
+
+        This web service is PCI compliant if used correctly with the `pcimask`
+        attribute. To enable PCI compliant behavior the optional `pcimask`
+        header must be set to "true". The Source application needs to be
+        approved for PCI compliant processing prior to using this value. When
+        using the `pcimask` header with value "true" the service will adhere to
+        PCI as follows:
+          - `CardId` and `CardIdVNo` replaces `CardNo` and `VersionNo` as unique key towards a card record
+          - `CardNo` and `VersionNo` may be ommited in requests
+          - Wherever `CardNo` is needed as input, `CardId` shall be used instead
+          - Wherever `VersionNo` not needed as input, `CardIdVNo` shall be used instead
+          - `CardNo` will be masked according to PCI rules in responses
+
+        If WS-consumer is running within a PCI compliant enviroment and
+        `pcimask` is "false" or not present in the request:
+          - `CardNo` and `VersionNo` shall be used as in previous versions of this service
+          - `CardNo` and `VersionNo` is unique key towards a card record
+          - `CardNo` will not be masked in responses
+
+        **Field validation:**
+          - InstitutionId must exist in CAS
+          - BranchId must be known in CAS, if present in txn
+          - CustomerNo/Customer must be present in CAS
+          - CustomerStatus must be "0" = OK, all other values will reject transaction
+          - EmbossedName can not be emtpty string and max length according to product setup (default max length 26)
+          - Expire must contain only numeric values and valid value
+          - ProductId must exist and be valid in CAS
+          - AccountNo must be within allowed accountrange
+          - ShipmentMethodPin must be valid, valid values is set up on each product
+          - ShipmentMethodCard must be valid, valid values is set up on each product
+          - CreditCard, credit account must exist in CAS.
+          - CredLimit must match product setup, between max and min values
+          - CredLimit must be below the accounts creditlimit
+          - BulkId must exist in CAS
+      parameters:
+        - $ref: '#/components/parameters/PCIMaskParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardCreate'
+      responses:
+        '200':
+          description: DCSSCardCreate completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardCreateResponse'
+        '400':
+          description: Embossedname to long or some other field validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: 'Institution, Branch, Consumer, Product or Bulk doesn''t exist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: >-
+            System Error or Communication error between Webservice and
+            underlying system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  /payments/history:
+    get:
+      tags:
+        - payments
+      operationId: cardHistory
+      summary: Card history
+      description: >
+        **Authorization**: JWT of any logged in user
+
+
+        Returns list of changes to the card during its lifecycle. Client apps.
+        must use one, and only one, of the input key-fields.
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PerPageParam'
+        - $ref: '#/components/parameters/AccountNoParam'
+        - $ref: '#/components/parameters/CardNoParam'
+        - $ref: '#/components/parameters/CustomerIdStringParam'
+        - $ref: '#/components/parameters/InstIdParam'
+        - $ref: '#/components/parameters/VersionNoParam'
+      responses:
+        '200':
+          description: DCSSCardHistory completed successfully
+          headers:
+            X-Page:
+              $ref: '#/components/parameters/XPageParam'
+            X-Per-Page:
+              $ref: '#/components/parameters/XPerPageParam'
+            Link:
+              $ref: '#/components/parameters/LinkParam'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardHistory'
+        '400':
+          description: 'No key-field or more than one, or invalid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '500':
+          description: >-
+            System Error or Communication error between Webservice and
+            underlying system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  /loyalty/rules:
+    get:
+      tags:
+        - loyaltyRules
+      operationId: listRules
+      summary: List Rules
+      description: |
+        **Authorization**: JWT, only Admin
+
+        Get paginated data of all the rules
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PerPageParam'
+      responses:
+        '200':
+          description: Loyalty Rules received successfully
+          headers:
+            X-Total-Count:
+              $ref: '#/components/parameters/XTotalCountParam'
+            X-Page:
+              $ref: '#/components/parameters/XPageParam'
+            X-Per-Page:
+              $ref: '#/components/parameters/XPerPageParam'
+            Link:
+              $ref: '#/components/parameters/LinkParam'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoyaltyRule'
+        '400':
+          description: Invalid pagination parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '403':
+          description: Not an Admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    post:
+      tags:
+        - loyaltyRules
+      operationId: createRule
+      summary: create a Rule
+      description: |
+        **Authorization**: JWT, only Admin
+
+        Create a Rule for given operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoyaltyRuleCreate'
+      responses:
+        '201':
+          description: Loyalty Rule created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyRule'
+        '400':
+          description: Invalid data in body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '403':
+          description: Not an Admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  '/loalty/rules/{ruleId}':
+    parameters:
+      - $ref: '#/components/parameters/loyaltyRuleIdParam'
+    get:
+      tags:
+        - loyaltyRules
+      operationId: getRule
+      summary: Get a Rule by ID
+      description: |
+        **Authorization**: JWT, only Admin
+
+        Get a Rule by ID
+      responses:
+        '200':
+          description: Loyalty Rule received successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyRule'
+        '400':
+          description: Invalid ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '403':
+          description: Not an Admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+        '404':
+          description: There is no Rule with that ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    patch:
+      tags:
+        - loyaltyRules
+      operationId: partialUpdateRule
+      summary: Partially update a Rule
+      description: |
+        **Authorization**: JWT, only Admin
+
+        Partially update a Rule by ID. Only specied fields will be updated.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoyaltyRule'
+      responses:
+        '200':
+          description: Loyalty Rule updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyRule'
+        '400':
+          description: Invalid ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '403':
+          description: Not an Admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+        '404':
+          description: There is no Rule with that ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    put:
+      tags:
+        - loyaltyRules
+      operationId: updateRule
+      summary: Update a Rule
+      description: |
+        **Authorization**: JWT, only Admin
+
+        Update a Rule by ID. All fields are required.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoyaltyRuleCreate'
+      responses:
+        '200':
+          description: Loyalty Rule updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyRule'
+        '400':
+          description: Invalid ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '403':
+          description: Not an Admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+        '404':
+          description: There is no Rule with that ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    delete:
+      tags:
+        - loyaltyRules
+      operationId: deleteRule
+      summary: Delete a Rule
+      description: |
+        **Authorization**: JWT, only Admin
+
+        Delete a Rule by ID.
+      responses:
+        '204':
+          description: Loyalty Rule deleted successfully
+        '400':
+          description: Invalid ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '403':
+          description: Not an Admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+        '404':
+          description: There is no Rule with that ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  /loyalty/points:
+    get:
+      tags:
+        - loyaltyPoints
+      operationId: listTransactions
+      summary: List Loyalty Points Transactions
+      description: |
+        **Authorization**: JWT, only Admin
+
+        Get paginated data of all the Loyalty Points Transactions
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PerPageParam'
+      responses:
+        '200':
+          description: Loyalty Points Transactions received successfully
+          headers:
+            X-Total-Count:
+              $ref: '#/components/parameters/XTotalCountParam'
+            X-Page:
+              $ref: '#/components/parameters/XPageParam'
+            X-Per-Page:
+              $ref: '#/components/parameters/XPerPageParam'
+            Link:
+              $ref: '#/components/parameters/LinkParam'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoyaltyTransaction'
+        '400':
+          description: Invalid pagination parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '403':
+          description: Not an Admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    post:
+      tags:
+        - loyaltyPoints
+      operationId: createTransaction
+      summary: create a Loyalty Points Transaction
+      description: |
+        **Authorization**: JWT, only Admin
+
+        Create a Transaction for given operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoyaltyTransactionCreate'
+      responses:
+        '201':
+          description: Loyalty Points Transaction created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyTransaction'
+        '400':
+          description: Invalid data in body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '403':
+          description: Not an Admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  '/loalty/points/{transactionId}':
+    parameters:
+      - $ref: '#/components/parameters/loyaltyTransactionIdParam'
+    get:
+      tags:
+        - loyaltyPoints
+      operationId: getTransaction
+      summary: Get a Transaction
+      description: |
+        **Authorization**: JWT, only Admin
+
+        Get a Loyalty Points Transaction by ID
+      responses:
+        '200':
+          description: Loyalty Points Transaction received successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyTransaction'
+        '400':
+          description: Invalid ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '403':
+          description: Not an Admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+        '404':
+          description: There is no Loyalty Points Transaction with that ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  /loyalty/points/redeem:
+    put:
+      tags:
+        - loyaltyPoints
+      operationId: redeemPoints
+      summary: Redeem Loyalty Points
+      description: |
+        **Authorization**: JWT any logged in user
+
+        Redeem Loyalty Points by an authenticated user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoyaltyPoints'
+      responses:
+        '200':
+          description: Loyalty Points Transaction redeemed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyTransaction'
+        '400':
+          description: Invalid points
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  /loyalty/points/buy:
+    put:
+      tags:
+        - loyaltyPoints
+      operationId: buyPoints
+      summary: Buy Loyalty Points
+      description: |
+        **Authorization**: JWT any logged in user
+
+        Buy Loyalty Points by an authenticated user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoyaltyPoints'
+      responses:
+        '200':
+          description: Loyalty Points Transaction bought successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyTransaction'
+        '400':
+          description: Invalid points
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: No JWT or JTW is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+components:
+  parameters:
+    PCIMaskParam:
+      name: pcimask
+      in: header
+      description: Whether to enable PCI compliant behavior
+      example: true
+      schema:
+        type: string
+        default: false
+    XTotalCountParam:
+      name: X-Total-Count
+      in: header
+      example: 100
+      description: Total number of records
+      schema:
+        type: integer
+    XPageParam:
+      name: X-Page
+      in: header
+      example: 1
+      description: Current page
+      schema:
+        type: integer
+    XPerPageParam:
+      name: X-Per-Page
+      in: header
+      example: 20
+      description: Total number of pages
+      schema:
+        type: integer
+    LinkParam:
+      name: Link
+      in: header
+      example: >-
+        Link: <https://example.com/api/v1/payments/cards?page=1&per_page=20>;
+        rel="first",
+        <https://example.com/api/v1/payments/cards?page=2&per_page=20>;
+        rel="next",
+        <https://example.com/api/v1/payments/cards?page=10&per_page=20>;
+        rel="last"
+      description: relations to other pages
+      schema:
+        type: string
+    PageParam:
+      name: page
+      in: query
+      example: 1
+      schema:
+        type: integer
+        default: 1
+    PerPageParam:
+      name: per_page
+      in: query
+      example: 20
+      schema:
+        type: integer
+        default: 20
+    AccountNoParam:
+      name: AccountNo
+      in: query
+      description: Account Number
+      schema:
+        minLength: 1
+        type: string
+        maxLength: 35
+        example: XXXXXXXXXXXXXXXXXXXXXXXX
+    AccountOwnerParam:
+      name: AccountOwner
+      in: query
+      description: Account owners customer number
+      schema:
+        type: string
+        maxLength: 35
+        example: XXXXXXXXXX
+    BranchParam:
+      name: Branch
+      in: query
+      description: Branch ID. Identifies which branch the card belongs too
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 9
+        example: XXXXXXXXX
+    CardIdParam:
+      name: CardId
+      in: query
+      description: CardIdent
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+        maximum: 10000000000000000
+        example: 1234
+    CardNoParam:
+      name: CardNo
+      in: query
+      description: Card Number
+      schema:
+        type: string
+        minLength: 11
+        maxLength: 19
+        example: 1234123412341234
+    CustomerIdParam:
+      name: CustomerId
+      in: query
+      description: >-
+        CustomerIdentification. Customer identification in external system. This
+        id is used to match the card with customerdata received from external
+        system. This might be a sequnce number assigned, or any other numbering
+        system used in the external system
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+        maximum: 100000000000000000
+        example: 1234
+    CustomerIdStringParam:
+      name: CustomerId
+      in: query
+      description: CustomerId
+      schema:
+        type: string
+        minLength: 11
+        maxLength: 17
+        example: 1234
+    CardIdVNoParam:
+      name: CardIdVNo
+      in: query
+      description: CardId Version Number
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 999
+        example: 1
+    CustomerNoParam:
+      name: CustomerNo
+      in: query
+      description: >-
+        CustomerNumber. CustomerNo (Person/Foretaksnr) Typically contains
+        "Social security number" or equivalent data for this customer. Must be
+        present in CAS
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 35
+        example: XXXXXXXXXXXX
+    ExtAgreementIdParam:
+      name: ExtAgreementId
+      in: query
+      description: Agreement id external to CAS
+      schema:
+        type: string
+        maxLength: 19
+        example: XXXXXXXXXXXXXXXXXXX
+    ExternalProductIdParam:
+      name: ExternalProductId
+      in: query
+      description: >-
+        Optional input external product identifier. If present in request only
+        cards eligible for this external product will be present in respons
+        message. If the card has an agreement for this external productId then
+        the agreementNo item will be present in response messages
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 20
+        example: XXXXXXXXXX
+    InstIdParam:
+      name: InstId
+      in: query
+      description: >-
+        Institution ID. Identifies which bank that has issued the card. Must
+        exist in CAS
+      schema:
+        type: string
+        minLength: 4
+        maxLength: 9
+        example: XXXXXXXXX
+    OptionParam:
+      name: Option
+      in: query
+      description: |
+        Search options.
+        **CAS**
+          - 0 = Open and Blocked cards are listed
+          - 1 = only open card are listed
+          - 2 only blocked cards are listed
+          - 3 = only deleted cards are listed
+          - 9 All cards is listed regardles of status
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 9
+        default: null
+        example: 0
+    VersionNoParam:
+      name: VersionNo
+      in: query
+      description: Card Version Number
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 3
+        example: '1'
+    loyaltyRuleIdParam:
+      name: ruleId
+      in: path
+      description: Rule ID
+      required: true
+      schema:
+        type: integer
+        format: int32
+        example: 123
+    loyaltyTransactionIdParam:
+      name: transactionId
+      in: path
+      description: Loyalty Points Transaction ID
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 12345
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    CardCreate:
+      type: object
+      required:
+        - CardCity
+        - CardPostalCode
+        - CustomerId
+        - CustomerNo
+        - EmbossedName
+        - FirstName
+        - InstId
+        - LastName
+        - PinCity
+        - PinPostalCode
+        - ProductId
+        - ShipmentMethodCard
+        - ShipmentMethodPin
+      properties:
+        CardCity:
+          type: string
+          maxLength: 30
+          writeOnly: true
+          description: Postal city. Field is used on card shipment envelope
+          example: Warszawa
+        CardPostalCode:
+          type: string
+          maxLength: 9
+          writeOnly: true
+          description: Postal code. Field is used on card shipment envelope
+          example: 00-001
+        CustomerId:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 100000000000000000
+          writeOnly: true
+          description: >-
+            CustomerIdentification. Customer identification in external system.
+            This id is used to match the card with customerdata received from
+            external system. This might be a sequnce number assigned, or any
+            other numbering system used in the external system
+          example: 1234
+        CustomerNo:
+          type: string
+          minLength: 1
+          maxLength: 35
+          writeOnly: true
+          description: >-
+            CustomerNumber. CustomerNo (Person/Foretaksnr) Typically contains
+            "Social security number" or equivalent data for this customer. Must
+            be present in CAS
+          example: XXXXXXXXXXXX
+        EmbossedName:
+          type: string
+          maxLength: 26
+          writeOnly: true
+          description: Embossed name
+        FirstName:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: >-
+            First Name. Field is used in card shipment on envelope, field is
+            also encoded in magnetic stripe
+          example: John
+        InstId:
+          type: string
+          minLength: 4
+          maxLength: 9
+          writeOnly: true
+          description: >-
+            Institution ID. Identifies which bank that has issued the card. Must
+            exist in CAS
+          example: XXXXXXXXX
+        LastName:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: >-
+            Last Name. Field is used in card shipment envelope, field is also
+            encoded in magnetic stripe
+          example: Doe
+        PinCity:
+          type: string
+          maxLength: 30
+          writeOnly: true
+          description: Postal city(PostSted). Field is used on card shipment envelope
+          example: Warszawa
+        PinPostalCode:
+          type: string
+          maxLength: 9
+          writeOnly: true
+          description: Postal code. Field is used on PIN shipment envelope
+          example: 00-001
+        ProductId:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 99999
+          writeOnly: true
+          description: Product ident.
+          example: 1234
+        ShipmentMethodCard:
+          type: string
+          minLength: 1
+          maxLength: 1
+          writeOnly: true
+          description: >
+            Card Shipment method.
+
+            - K = Courier Cardholder
+
+            - C = Courier Bank
+
+            - D = Registered post Bank
+
+            - R = Registered post Cardholder
+
+            - P = Ordinary post Cardholder
+
+            - B = Ordinary post Bank
+
+
+            Default value for this field is returned with ProductList API
+            function Valid values for given product is defined API
+            ProductTypeList.ShipmentMethods
+          example: R
+        ShipmentMethodPin:
+          type: string
+          minLength: 1
+          maxLength: 1
+          writeOnly: true
+          description: >
+            Card Shipment method.
+
+            - K = Courier Cardholder
+
+            - C = Courier Bank
+
+            - D = Registered post Bank
+
+            - R = Registered post Cardholder
+
+            - P = Ordinary post Cardholder
+
+            - B = Ordinary post Bank
+
+            - N = Pin avail in Internett bank (Only valid for use with internet
+            bank)
+
+
+            Default value for this field is returned with ProductList API
+            function Valid values for given product is defined API
+            ProductTypeList.ShipmentMethodsPin
+          example: R
+        AccountNo:
+          type: string
+          minLength: 1
+          maxLength: 35
+          writeOnly: true
+          description: >
+            AccountNumber. This field is mandatory for all debit and credit
+            cards. Should be omitted for prepaid cards.
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        AccountNo2:
+          type: string
+          minLength: 1
+          maxLength: 35
+          writeOnly: true
+          description: 'Account Number 2, used for ComboCard'
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        AccountOwner:
+          type: string
+          minLength: 1
+          maxLength: 35
+          writeOnly: true
+          description: Account owners customer number
+          example: XXXXXXXXXXXX
+        ActivateFlag:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 9
+          writeOnly: true
+          description: |
+            Card activating indicator. Values:
+            - 0 = Active
+            - 8 = New card, must activate in ATM
+            - 9 = New card, not activated
+        AddrTypeCard:
+          type: string
+          minLength: 1
+          maxLength: 2
+          writeOnly: true
+          description: |
+            Address Type/card shipment. Valid values:
+            - "S" = Statement adress
+            - "A" = Alternate adress
+          example: S
+        AddrTypePin:
+          type: string
+          minLength: 1
+          maxLength: 2
+          writeOnly: true
+          description: |
+            Address Type/card shipment. Valid values:
+            - "S" = Statement adress
+            - "A" = Alternate adress
+          example: S
+        AnnualFeeAccountNo:
+          type: string
+          maxLength: 35
+          writeOnly: true
+          description: AnnualFeeAccountNo
+          example: XXXXXXXXXX
+        BulkId:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 99999999
+          writeOnly: true
+          description: >-
+            Bulk ID, Unique id of this bulk of cards. Field is only used in
+            bulk-orders, mandatory for bulk
+          example: 1234
+        CardAddress1:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 1. Field is used on card shipment envelope
+        CardAddress2:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 2. Field is used on card shipment envelope
+        CardAddress3:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 3. Field is used on card shipment envelope
+        CardAddress4:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 4. Field is used on card shipment envelope
+        CardAddress5:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 5. Field is used on card shipment envelope
+        CardAddress6:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 6. Field is used on card shipment envelope
+        CardCountry:
+          type: string
+          maxLength: 30
+          writeOnly: true
+          description: Country. Field is used on card shipment envelope
+          example: Poland
+        CardDeliveryBank:
+          type: string
+          minLength: 4
+          maxLength: 9
+          writeOnly: true
+          description: Card Delivery Bank
+        CardDesignNo:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 999999
+          writeOnly: true
+          description: CardDesignNo
+        CardFlag:
+          type: string
+          minLength: 2
+          maxLength: 2
+          writeOnly: true
+          description: >-
+            CardFlag. Multipurpose field used to set various indicators for the
+            card. Valid values "if" = No automatic renewal
+          example: if
+        CardInfo:
+          type: string
+          maxLength: 50
+          writeOnly: true
+          description: Card Information. This is a freetext field.
+        ChargeAccountNo:
+          type: string
+          minLength: 1
+          maxLength: 35
+          writeOnly: true
+          description: >-
+            Alternate charge account. Used when an alternate account should be
+            debited for financial tx. Usually this field is used when several
+            card are issued to different family member on different accounts,
+            but only 1 account should be debited
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        CredLimit:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 999999999999
+          writeOnly: true
+          description: >-
+            CredLimit must match product setup, between max and min values. Must
+            be below the accounts creditlimit
+        EmbossedName2:
+          type: string
+          maxLength: 26
+          writeOnly: true
+          description: Embossed Name 2.
+        Expire:
+          type: string
+          minLength: 4
+          maxLength: 4
+          writeOnly: true
+          description: >-
+            Card Expiry date. YYMM Expire is asigned by system as default, only
+            used if should expire before or after default. Default expiretime is
+            defined for each product
+          example: 2208
+        ExtPictureId:
+          type: string
+          minLength: 1
+          maxLength: 30
+          writeOnly: true
+          description: >-
+            External picture ident. Used with CardLikeMe or TagMyCard
+            soulutions, identifies picture that the cardholder has created for
+            the cardorder
+        FeeMonth:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 12
+          writeOnly: true
+          description: >-
+            Annual Fee month. Identifies which month the annual fee should be
+            charged, by default this same as month MM of the expiry date
+          example: 6
+        GKIndikator:
+          type: string
+          minLength: 1
+          maxLength: 1
+          writeOnly: true
+          description: >-
+            Indicates that the card manufactor should wait for a new GrunnKort
+            before creating the card,
+        MakeCheckSts:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 99
+          writeOnly: true
+          description: Status for Card
+          example: 1
+        Note:
+          type: string
+          maxLength: 256
+          writeOnly: true
+          description: Notepad field (256 chars)
+        OrderPurpose:
+          type: string
+          minLength: 1
+          maxLength: 1
+          writeOnly: true
+          description: >-
+            Only possible value is "P" - Pilot order. Otherwise empty or absent
+            to use product setup
+          example: P
+        OrderType:
+          type: string
+          minLength: 1
+          maxLength: 1
+          writeOnly: true
+          description: >
+            OrderType. Valid values "K" = Card Order, "P" = Pin order, "A" =
+            Card and PIN, " " No shipment of Card og Pin(emergency card) Default
+            value should be retreived for API ProductList
+          example: K
+        PAmounthLengthSp3:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 99
+          writeOnly: true
+          description: Length of periode
+        PAmounthSp3:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 99
+          writeOnly: true
+          description: Periode amounth limit
+        PinAddress1:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 1. Field is used on PIN shipment envelope.
+        PinAddress2:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 2. Field is used on Pin shipment envelope.
+        PinAddress3:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 3. Field is used on PIN shipment envelope.
+        PinAddress4:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 4. Field is used on PIN shipment envelope.
+        PinAddress5:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 5. Field is used on PIN shipment envelope.
+        PinAddress6:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 6. Field is used on PIN shipment envelope.
+        PinCountry:
+          type: string
+          maxLength: 30
+          writeOnly: true
+          description: Postal city(PostSted). Field is used on card shipment envelope
+          example: Poland
+        PinMethod:
+          type: string
+          minLength: 1
+          maxLength: 1
+          writeOnly: true
+          description: >-
+            Pin method. Valid values "S" = Customer choosen at
+            card-terminal/ATM, "T" = System generated.
+          example: S
+        PinName:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Last Name. Field is used in PIN shipment envelope.
+        ShipmentDate:
+          type: string
+          format: date
+          writeOnly: true
+          description: >-
+            Shipment date. Shipmentdate is set default by systemdate, only used
+            if card should be shipped in the future
+          example: '2020-01-01T00:00:00.000Z'
+        SIR:
+          type: string
+          minLength: 16
+          maxLength: 21
+          writeOnly: true
+          description: >-
+            SIR, Service Instance Reference, value as returned from
+            CheckEligebility service. Field is mandatory when creating a Valyou
+            payment card
+          example: XXXXXXXXXXXXXXXX
+        ValidFromDate:
+          type: string
+          format: date
+          writeOnly: true
+          description: Valid from date
+          example: '2019-12-01T00:00:00.000Z'
+    CardCreateResponse:
+      type: object
+      properties:
+        CardId:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 10000000000000000
+          description: CardIdent
+          example: 1234
+        CardIdVNo:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 999
+          description: CardId Version Number
+          example: 1
+        CardNo:
+          type: string
+          minLength: 11
+          maxLength: 19
+          description: >-
+            Card Number. Field is masked according to PCI if header
+            `pcimask`=truer, otherwise CardNo will be returned unmasked
+          example: XXXXXXXXXXXXXXXX
+        TxAccountNo:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 4999999999999999
+          description: >-
+            Transaction Account number (Card Number Alias). Used for
+            CreditCards.
+          example: 1234
+        VersionNo:
+          type: string
+          minLength: 1
+          maxLength: 3
+          description: Version number generated by CAS
+          example: '1'
+    CardHistory:
+      type: object
+      properties:
+        AccountNo:
+          type: string
+          minLength: 1
+          maxLength: 35
+          description: Account Number
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        CardNo:
+          type: string
+          minLength: 11
+          maxLength: 19
+          description: Card Number
+          example: 1234123412341234
+        VersionNo:
+          type: string
+          minLength: 1
+          maxLength: 3
+          description: Card Version Number
+          example: '1'
+        EventDate:
+          type: string
+          format: date
+          description: Event date
+          example: '2019-11-01T00:00:00.000Z'
+        EventDetails:
+          type: string
+          maxLength: 999
+          description: >-
+            Event description. Format = x(999) Textfield describing reason why
+            card is blocked.
+        EventInstId:
+          type: string
+          maxLength: 9
+          description: >-
+            Institution ID. Format "x(9)" Identifies which bank/org who
+            initiated the card blocking
+          example: XXXXXXXXX
+        EventText:
+          type: string
+          maxLength: 999
+          description: >-
+            Event description. Format = x(999) Textfield describing reason why
+            card is blocked.
+        EventTime:
+          type: string
+          minLength: 6
+          maxLength: 6
+          description: Event Time. Format = 9(6) HHMMSS Time when block created
+          example: 213059
+        TCode:
+          type: string
+          maxLength: 6
+          description: >-
+            Transaction code. Identifies which transaction that was used for
+            this event/change on the card
+          example: 999999
+        UserId:
+          type: string
+          maxLength: 35
+          description: >-
+            UserId. Format "x(35)" Identifies user within bank/org who initiated
+            the card blocking
+          example: XXXXXXXXXX
+    CardList:
+      type: object
+      properties:
+        AccountNo:
+          type: string
+          minLength: 1
+          maxLength: 35
+          description: Account Number
+          example: XXXXXXXXXXXXXXXXXXXXXXXX
+        AccountOwner:
+          type: string
+          maxLength: 35
+          description: Account owners customer number
+          example: XXXXXXXXXX
+        Branch:
+          type: string
+          minLength: 3
+          maxLength: 9
+          description: Branch ID. Identifies which branch the card belongs too
+          example: XXXXXXXXX
+        CardId:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 10000000000000000
+          description: CardIdent
+          example: 1234
+        CardIdVNo:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 999
+          description: CardId Version Number
+          example: 1
+        CustomerId:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 100000000000000000
+          description: >-
+            CustomerIdentification. Customer identification in external system.
+            This id is used to match the card with customerdata received from
+            external system. This might be a sequnce number assigned, or any
+            other numbering system used in the external system
+          example: 1234
+        CustomerNo:
+          type: string
+          minLength: 1
+          maxLength: 35
+          description: >-
+            CustomerNumber. CustomerNo (Person/Foretaksnr) Typically contains
+            "Social security number" or equivalent data for this customer. Must
+            be present in CAS
+          example: XXXXXXXXXXXX
+        ExtAgreementId:
+          type: string
+          maxLength: 19
+          description: Agreement id external to CAS
+          example: XXXXXXXXXXXXXXXXXXX
+        AccountBalance:
+          type: number
+          format: float
+          description: >-
+            Balance. Field empty if not `PaymentScheme` = "C" credit. This field
+            is not returned by CAS (EDB CC only)
+          example: 1234.56
+        AccountNo2:
+          type: string
+          minLength: 1
+          maxLength: 35
+          description: 'Account Number 2, used for combo card'
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        ActivateFlag:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 9
+          description: |
+            Card activating indicator. Values:
+            - 0 = Active
+            - 8 = New card, must activate in ATM
+            - 9 = New card, not activated
+        AggreementNo:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 999999999
+          description: >-
+            ExternalProduct AgreementNo, if not 0 then a external Product
+            agreement exists with externalProductId as provided in request. If
+            agreementNo is 0 then this card is eligible for this
+            externalProduct, but no agreement has been established
+          example: 1
+        AvailBalance:
+          type: number
+          format: float
+          description: >-
+            Available balance on card. Consider using `AvailCredit` or
+            `UpperAccountAvailCredit` instead of this field
+          example: 1345.56
+        AvailCredit:
+          type: number
+          format: float
+          minimum: 0
+          description: >-
+            Real available credit on card, overdraft limits not included. No
+            sign. Always greater or equal to 0
+          example: 1234.56
+        BlockCode:
+          type: string
+          maxLength: 2
+          description: Blocking code
+          example: XX
+        BlockDate:
+          type: string
+          format: date
+          description: Blocked to date. Date when block created
+          example: '2020-01-01T00:00:00.000Z'
+        CardNo:
+          type: string
+          minLength: 11
+          maxLength: 19
+          description: Card Number
+          example: XXXXXXXXXXXXXXXX
+        CardNo2:
+          type: string
+          minLength: 11
+          maxLength: 19
+          description: 'CAS. Card Number 2, used for ComboCard'
+          example: XXXXXXXXXXXXXXXX
+        CardOrderStatus:
+          type: string
+          maxLength: 4
+          description: |
+            CardOrder status. Legal values are:
+            - Empty or field not present - Not processed
+            - ERR - Rejected because of error
+            - PROK - CardOrder sent, card produced.
+            - STOP - CardOrder stoped
+            - TVF - CardOrder marked forced renewal
+          example: PROK
+        CardType:
+          type: string
+          description: 'Card Type. Values = VISA, MC'
+          example: VISA
+        ClosedData:
+          type: string
+          format: date
+          description: >-
+            Date when card was closed. Field is empty prior to card expiry or
+            CardDelete function
+          example: '2019-01-01T00:00:00.000Z'
+        CredLimit:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 999999999999
+          description: >-
+            Credit limit. credit. This field is not returned by CAS (EDB CC
+            only)
+          example: 9999
+        DateCreated:
+          type: string
+          format: date
+          description: Date when card was created.
+          example: '2019-01-01T00:00:00.000Z'
+        DateLastTx:
+          type: string
+          format: date
+          description: Date last financial transaction
+          example: '2019-11-01T00:00:00.000Z'
+        DebitAccount:
+          type: string
+          maxLength: 35
+          description: >-
+            DebitAccount used when `PaymentMethod` = 1 direct debet. Field is
+            mandatory where direct debit is used
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        EmbossedName:
+          type: string
+          maxLength: 26
+          description: Embossed Name
+        EmbossedName2:
+          type: string
+          maxLength: 26
+          description: Embossed Name 2
+        Expire:
+          type: string
+          minLength: 4
+          maxLength: 4
+          description: Card expiry date. YYMM
+          example: 2208
+        FDK_STS:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 99
+          description: >
+            FD-kort (credit module) status Values:
+
+            - 00 OK, Credit module not relevant (debit cards)
+
+
+            Credit module OK
+
+            - 01 OK, credit data elements present
+
+            - 20 Ok, credit data elements OK, updates in CAS pending batch in
+            credit module.
+
+            - 25 Ok, error occured during batch update i credit-module
+
+
+            Credit data missing or not present in credit-module. Fields with
+            text "Field empty if not PaymentScheme = "C" credit" will be present
+            in reply but empty
+
+            - 10/15 New card or card not present in credit-module. Data-elements
+            from credit module not available
+
+            - 91 Internal comunication error, failed to call credit module
+
+            - 92 Internal comunication error, error occured in call credit
+            module
+
+            - 93 Internal error CAS, inconsistent data returned from credit
+            module
+
+            - 94 Internal error CAS, error-msg returnde from credit-module
+          example: 20
+        LoyaltyCardNo:
+          type: string
+          minLength: 11
+          maxLength: 19
+          description: Loyalty Card Number
+          example: XXXXXXXXXXXX
+        MakeCheckID:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 999999999999
+          description: CAS. Card MakeCheckID. Unique id for MakerChecker tab
+          example: 1234
+        MakeCheckSts:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 99
+          description: Status for Card
+        PaymentScheme:
+          type: string
+          minLength: 1
+          maxLength: 1
+          description: >-
+            Identifies payment scheme, "D" = debit, "C" = Credit, for future
+            use, "P" = purse, "G" = giftcard
+          example: D
+        ProductId:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 99999
+          description: Product ident
+          example: 1234
+        ProductName:
+          type: string
+          maxLength: 60
+          description: Product name
+        ProductTypeName:
+          type: string
+          maxLength: 30
+          description: Product Type Name
+        RecId:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 99999999999
+          description: >-
+            Unique record id of the card order. Identifies which bank that has
+            issued the card.
+        ReferenceAccount:
+          type: string
+          maxLength: 35
+          description: Reference Account
+          example: XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        Replaced:
+          type: boolean
+          description: >-
+            Replacement indicator. True if Card has been re-ordered or renewed,
+            another re-order not allowed and will be rejected. False if re-order
+            is possible
+          example: true
+        SIR:
+          type: string
+          minLength: 16
+          maxLength: 21
+          description: Service Instance
+          example: XXXXXXXXXXXXXXXX
+        Status:
+          type: string
+          maxLength: 4
+          description: |
+            Card status.
+            **CAS**
+            - "SPER" Card is Blocked
+            - "SLET" Card deleted
+            - "IAKT" Card is not activated
+            - Empty or element absent - Status OK
+          example: IAKT
+        SuspAmount:
+          type: number
+          format: float
+          description: >-
+            Suspended amount. Total authorised amount, not yet cleared with a
+            financial transaction
+          example: 1234.56
+        TokenCounter:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 999
+          deprecated: true
+          description: >-
+            Token Counter. Field has been deprecated. Will not be returned after
+            3.1.7.
+        Tokenized:
+          type: boolean
+          description: 'True if tokenized card, otherwise false.'
+          example: true
+        TxAccountNo:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 4999999999999999
+          description: >-
+            Transaction Account number (Card Number Alias). Used for
+            CreditCards.
+          example: 1234
+        UpperAccountAvailCredit:
+          type: number
+          format: float
+          minimum: 0
+          description: >-
+            Real available credit on account, overdraft limits not included. No
+            sign. Always greater or equal to 0
+          example: 1234.56
+        UpperAccountBalance:
+          type: string
+          maxLength: 8
+          description: >-
+            Balance on invoice/billing level. Field empty if not `PaymentScheme`
+            = "C" credit. This field is not returned by CAS (EDB CC only)
+          example: XXXXXXXX
+        UpperAccountCredLimit:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 9999999999
+          description: >-
+            Upper Account Credit limit. credit. This field is not returned by
+            CAS (EDB CC only)
+          example: 1234
+        VersionNo:
+          type: string
+          minLength: 1
+          maxLength: 3
+          description: Card Version Number
+          example: '1'
+    CustomerCreate:
+      type: object
+      required:
+        - CustomerNo
+        - InstId
+      properties:
+        CustomerNo:
+          type: string
+          minLength: 1
+          maxLength: 35
+          writeOnly: true
+          description: CustomerNumber
+          example: XXXXXXXXXXXXXXXXXXXXXXXXX
+        InstId:
+          type: string
+          minLength: 4
+          maxLength: 9
+          writeOnly: true
+          description: Institution ID. Identifies which bank that has issued the card.
+          example: XXXXXXXXX
+        AccountList:
+          type: string
+          maxLength: 3600
+          writeOnly: true
+          description: >
+            The account numbers to be used when creating debit cards must be
+            present in AccountList. Each account is a TLV structure
+              - Mandatory tags:
+                - TAG "01" = AccountNo,
+                - TAG "02" = PaymentScheme Values: D debit, C credit, S shadowbalance
+              - Optional tags:
+                - TAG "06" = ProductCode (LF, as received from LF)
+                - TAG "07" = Accountowners CustomerNo
+                - TAG "08" = ProductName (LF, as received from LF)
+                - TAG "09" = Relation-code (LF-only)
+                - TAG "10" = Clearing code (LF-Only)
+              - Optional tags, for future use:
+                - TAG "03" = Currencycode
+                - TAG "04" = ProductList, identifies which cards may be issued on this account
+                - TAG "05" = MakeChecksts of the account, if unchecked cards should not be issued. Default value is "0", MakeChecksts not used/relevant for this account
+        Address1:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 1.
+        Address2:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 2.
+        Address3:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 3.
+        Address4:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 4.
+        Address5:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Address line 5.
+        Address6:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Alternate address line 6.
+        AltAddress1:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Alternate address line 1.
+        AltAddress2:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Alternate address line 2.
+        AltAddress3:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Alternate address line 3.
+        AltAddress4:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Alternate address line 4.
+        AltAddress5:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Alternate address line 5.
+        AltAddress6:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Alternate address line 6.
+        AltCity:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: AlternateCity
+          example: Warszawa
+        AltCountry:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Alternate country
+          example: Poland
+        AltPostalCode:
+          type: string
+          maxLength: 9
+          writeOnly: true
+          description: Alternate postal code
+          example: 01-001
+        AuthA1:
+          type: string
+          maxLength: 64
+          writeOnly: true
+          description: Answer to question No 1
+        AuthA2:
+          type: string
+          maxLength: 64
+          writeOnly: true
+          description: Answer to question No 1
+        AuthA3:
+          type: string
+          maxLength: 64
+          writeOnly: true
+          description: Answer to question No 1
+        AuthQ1:
+          type: string
+          maxLength: 124
+          writeOnly: true
+          description: Question No 1 used for customer authentication
+        AuthQ2:
+          type: string
+          maxLength: 124
+          writeOnly: true
+          description: Question No 2 used for customer authentication
+        AuthQ3:
+          type: string
+          maxLength: 124
+          writeOnly: true
+          description: Question No 3 used for customer authentication
+        BirthDate:
+          type: string
+          format: date
+          writeOnly: true
+          description: Date of birth for customer
+          example: '1990-01-01'
+        Branch:
+          type: string
+          minLength: 2
+          maxLength: 9
+          writeOnly: true
+          description: 'Branch ID, must exist in CAS if present'
+          example: XXXXXXXXX
+          default: InstId
+        BusinessPhone:
+          type: string
+          maxLength: 16
+          writeOnly: true
+          description: Business phone
+          example: '+4822111111111'
+        Citizenship:
+          type: string
+          maxLength: 25
+          writeOnly: true
+          description: Citizenship customer
+        City:
+          type: string
+          maxLength: 30
+          writeOnly: true
+          description: Postal city
+          example: Warsaw
+        CompanyName:
+          type: string
+          maxLength: 30
+          writeOnly: true
+          description: Company name. Only used for `customerType` = 6
+        Country:
+          type: string
+          maxLength: 30
+          writeOnly: true
+          description: Country
+          example: Poland
+        CountryCode:
+          type: string
+          maxLength: 3
+          writeOnly: true
+          description: Country code
+          example: PL
+        CreditAllowed:
+          type: string
+          maxLength: 1
+          writeOnly: true
+          description: Flag saying if customer is allowed for creditcard
+          example: 'Y'
+        CreditScodeAmount:
+          type: number
+          format: float
+          writeOnly: true
+          description: Creditscore amount
+          example: 1000.42
+        CustomerCategory:
+          type: string
+          maxLength: 20
+          writeOnly: true
+          description: Customer category. This is a freetext field.
+        CustomerId:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 100000000000000000
+          readOnly: true
+          description: CustomerIdent
+          example: 1234
+        CustomerInfo:
+          type: string
+          maxLength: 50
+          writeOnly: true
+          description: Customer category. This is a freetext field.
+        CustomerStatus:
+          type: string
+          maxLength: 4
+          writeOnly: true
+          description: |
+            Valid values:
+            - 0 - Customer OK
+            - 1 - Customer deceased
+            - 2 - Customer bankrupt
+            - 3 - Customer closed
+          example: '0'
+        CustomerType:
+          type: string
+          maxLength: 4
+          writeOnly: true
+          description: >
+            Legal values:
+
+            - 1 - Customer is a person. CustomerNo is a social security number
+
+            - 2 - Customer is an organisation. Card creation is not allowed.
+            CustomerNo is an organisation number
+
+            - 3 - Customer is a person with D number. CustomerNo is a D number
+
+            - 5 - Customer is an organisation. Card creation allowed. CustomerNo
+            is an organisation number
+
+            - 6 - Business customer. Card creation NOT allowed.
+        DigiPassSerialNo:
+          type: string
+          maxLength: 12
+          writeOnly: true
+          description: DigiPass serial number
+          example: XXXXXXXXXXXX
+        DrvLicNo:
+          type: string
+          maxLength: 24
+          writeOnly: true
+          description: Driver licence number
+        EmailHome:
+          type: string
+          maxLength: 75
+          writeOnly: true
+          description: Email home
+        EmailWork:
+          type: string
+          maxLength: 75
+          writeOnly: true
+          description: Email work
+        EmbossedName:
+          type: string
+          maxLength: 26
+          writeOnly: true
+          description: As received from external cust-sys
+        EmbossedNameLong:
+          type: string
+          maxLength: 30
+          writeOnly: true
+          description: Embossedname long variant. As received from external cust-sys
+        Felt1:
+          type: string
+          maxLength: 20
+          writeOnly: true
+          description: Kunde Felt1 Felt1 create
+        FirstName:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: >-
+            Field is used in card shipment on envelope, field is also encoded in
+            magnetic stripe1
+          example: John
+        GeoCode:
+          type: string
+          maxLength: 4
+          writeOnly: true
+          description: >-
+            Customer geografic code. if norwegian adress then "kommunenr".
+            Otherwise then 9 + country code ISOnumeric
+          example: '9616'
+        IndustryCode:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 99999
+          writeOnly: true
+          description: Accountowners Industry code
+        Language:
+          type: string
+          minLength: 2
+          maxLength: 2
+          writeOnly: true
+          description: Customers language code ISO-639-1
+          example: pl
+        LastName:
+          type: string
+          maxLength: 40
+          writeOnly: true
+          description: Last Name
+          example: Doe
+        LegalCustomer:
+          type: boolean
+          writeOnly: true
+          description: Flag saying if legal customer
+          example: true
+        MakeCheckSts:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 99
+          nullable: true
+          writeOnly: true
+          default: null
+          description: Status for maker checker
+          example: 1
+        Memo:
+          type: string
+          maxLength: 2000
+          writeOnly: true
+          description: Customer notes
+        MobilePhone:
+          type: string
+          maxLength: 20
+          writeOnly: true
+          description: Mobile phone
+          example: '+48602602602'
+        PassportNo:
+          type: string
+          maxLength: 24
+          writeOnly: true
+          description: Passport number
+          example: XXXXXXXXXX
+        PostalCode:
+          type: string
+          maxLength: 9
+          writeOnly: true
+          description: Postal code
+          example: 01-001
+        RelManagerEmail:
+          type: string
+          maxLength: 75
+          writeOnly: true
+          description: Relationship manager email
+          example: manager@example.com
+        RelManagerName:
+          type: string
+          maxLength: 60
+          writeOnly: true
+          description: Relationship manager name
+          example: John Doe
+        RelManagerTlf:
+          type: string
+          maxLength: 20
+          writeOnly: true
+          description: Relationship manager phone number
+          example: '+48602602602'
+        ScoreDate:
+          type: string
+          format: date
+          writeOnly: true
+          description: Score date
+          example: '2019-01-01'
+        SectorCode:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 99999
+          writeOnly: true
+          description: Accountowners SectorCode
+          example: 1
+        SignatureCardDate:
+          type: string
+          format: date
+          writeOnly: true
+          description: Date when SignatureCard was created
+          example: '2019-01-01'
+        SignaturRef:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 99999999
+          writeOnly: true
+          description: Signatureref
+          example: 1234
+        TDSecure:
+          type: string
+          maxLength: 20
+          writeOnly: true
+          description: 3D Secure password
+        Title:
+          type: string
+          maxLength: 8
+          writeOnly: true
+          description: CustomerTitle
+          example: Mr.
+        Tlf:
+          type: string
+          maxLength: 16
+          writeOnly: true
+          description: Phone number
+          example: '+48602602602'
+        VIPsts:
+          type: string
+          maxLength: 8
+          writeOnly: true
+          description: VIP status
+    LoyaltyRule:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+          description: Rule ID
+          example: 12345
+        operation:
+          type: string
+          description: Name of operation associated with the rule
+          example: make payment
+        rule:
+          type: object
+          description: >-
+            represantation of the rule in json-rules-engine form, see
+            https://www.npmjs.com/package/json-rules-engine
+          example:
+              {
+                conditions: {
+                  all: [
+                    {
+                      fact: 'amount',
+                      operator: 'greaterThanInclusive',
+                      value: 100,
+                    },
+                    {
+                      fact: 'amount',
+                      operator: 'lessThanInclusive',
+                      value: 200,
+                    }
+                  ]
+                }
+              }
+        reward:
+          type: integer
+          format: int32
+          description: Points awarded when the rule passes
+          example: 123
+    LoyaltyRuleCreate:
+      required:
+        - operation
+        - rule
+        - reward
+      allOf:
+        - $ref: '#/components/schemas/LoyaltyRule'
+    LoyaltyTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+          description: Loyalty Points Transaction ID
+          example: 123
+        userId:
+          type: integer
+          format: int32
+          description: User ID
+          example: 12345
+        ruleId:
+          type: integer
+          format: int32
+          nullable: true
+          default: null
+          description: 'Loyalty Rule ID, can be NULL'
+          example: 12345
+        amount:
+          type: integer
+          format: int32
+          description: Points added or taken
+          example: -20
+    LoyaltyTransactionCreate:
+      required:
+        - userId
+        - amount
+      allOf:
+        - $ref: '#/components/schemas/LoyaltyTransaction'
+    LoyaltyPoints:
+      type: object
+      required:
+        - points
+      properties:
+        points:
+          type: integer
+          format: int32
+          description: Points to redeem/buy
+          example: 500
+    BadRequest:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          description: Error message
+          example: Bad request
+    Unauthorized:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 401
+        message:
+          type: string
+          description: Error message
+          example: Unauthorized
+    Forbidden:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 403
+        message:
+          type: string
+          description: Error message
+          example: Forbidden
+    NotFound:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 404
+        message:
+          type: string
+          description: Error message
+          example: Not found
+    Conflict:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 409
+        message:
+          type: string
+          description: Error message
+          example: Conflict
+    ServerError:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 500
+        message:
+          type: string
+          description: Error message
+          example: Internal server error

@@ -1,0 +1,88 @@
+stages:
+  - build
+  - lint
+  - test
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - ${CI_PROJECT_DIR}/lpc-payment-backend-api/node_modules/
+    - ${CI_PROJECT_DIR}/__tools__/mocked-soap-api/node_modules/
+    - ${CI_PROJECT_DIR}/__tools__/mocked-soap-api/dist/
+
+include:
+  - template: Code-Quality.gitlab-ci.yml
+
+#################
+### lpc-payment-backend-api
+#################
+
+.general_lpc-payment:
+  image: node:13-alpine
+  before_script:
+    - cd lpc-payment-backend-api
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip-all-ci-jobs/
+  only:
+    changes:
+      - lpc-payment-backend-api/**/*.{json,yml,yaml,js,ts,sql}
+      - .codeclimate.yml
+      - .gitlab-ci.yml
+
+.soap_runner_lpc-payment:
+  image: node:13-alpine
+  before_script:
+    - cd __tools__/mocked-soap-api && npm start &
+    - cd lpc-payment-backend-api
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip-all-ci-jobs/
+  only:
+    changes:
+      - lpc-payment-backend-api/**/*.{json,yml,yaml,js,ts,sql}
+      - .codeclimate.yml
+      - .gitlab-ci.yml
+      
+
+install_dependencies_lpc_payment:
+  extends: .general_lpc-payment
+  stage: build
+  script:
+    - cd ../__tools__/mocked-soap-api && npm install && npm run build
+    - cd ../../lpc-payment-backend-api && npm install
+
+run_linter_lpc_payment:
+  extends: .general_lpc-payment
+  stage: lint
+  allow_failure: true
+  script:
+    - npm run lint
+
+# npx jest added explicitelly as people sometimes remove collectCoverageFrom from configuration
+unit_testing_lpc_payment:
+  extends: .soap_runner_lpc-payment
+  stage: test
+  allow_failure: true
+  script:
+    - npm run test:cov
+
+e2e_testing_lpc_payment:
+  extends: .soap_runner_lpc-payment
+  stage: test
+  allow_failure: true
+  script:
+    - npm run test:e2e
+
+#################
+### code-quality
+#################
+
+#do not change job name - here we overide some params from template
+code_quality:
+  stage: test
+  artifacts:
+    expire_in: 1 week
+    paths: [gl-code-quality-report.json]
+  only:
+    - merge_requests

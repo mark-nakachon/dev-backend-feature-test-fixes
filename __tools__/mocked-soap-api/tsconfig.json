@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "declaration": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "pretty": true,
+    "outDir": "dist",
+    "lib": ["es6"]
+  },
+  "include": [
+    "controllers/**/*",
+    "models/**/*"
+  ],
+  "files": [
+    "app.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

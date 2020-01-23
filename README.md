@@ -1,0 +1,6 @@
+# ReadMe
+1. I have re-factored the code, the authentication is done in middle-ware, role checking is done in guard, filter will handle all exceptions, interceptor will transform the PageDTO return result from controller before sending back to client. All entities are under entities folder. All providers are under provider folder. There Api group `payments`, `loyaltyRules` and `loyaltyPoints` are under `payments`, `loyalty-rules` and `loyalty-points` folder respectively.
+2. If you want to run postman test using docker-deployed app, just run `docker-compose up` under `lpc-payment-backend-api` folder. It will use soap server deployed in heroku and database in AWS RDS. Don't forget to clear and re-insert the test data into database.
+3. If you want to run postman test using local deployment, you should first start mocked soap server, check `mocked-soap-api`. Then using sql scripts under `lpc-payment-backend-api/db` to setup database.
+4. In `aws-cognito-setup` it provide detail instrument how to setup cognito. You can simply use my cognito instance for review.
+5. E2E test is out of scope. For Unit test, you can only cover logic inside controller layer.

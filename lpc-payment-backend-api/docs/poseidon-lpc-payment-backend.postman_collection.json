@@ -1,0 +1,4670 @@
+{
+	"info": {
+		"_postman_id": "045e27bb-8cbc-433b-88bb-11c65c4c9783",
+		"name": "poseidon-lpc-payment-backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "686c523e-b4c6-449e-9e9a-ef25c3ad04bf",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.environment.set(\"token\", pm.response.json()[\"idToken\"]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"user\": \"apptest123\",\n\t\"password\": \"Test1234!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://85gs2wfywb.execute-api.us-east-1.amazonaws.com/dev/login",
+							"protocol": "https",
+							"host": [
+								"85gs2wfywb",
+								"execute-api",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login(user not in lpc backend)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "686c523e-b4c6-449e-9e9a-ef25c3ad04bf",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.environment.set(\"new_user_token\", pm.response.json()[\"idToken\"]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"user\": \"apptest124\",\n\t\"password\": \"Test1234!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://85gs2wfywb.execute-api.us-east-1.amazonaws.com/dev/login",
+							"protocol": "https",
+							"host": [
+								"85gs2wfywb",
+								"execute-api",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login(user already create customer in NKS)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "686c523e-b4c6-449e-9e9a-ef25c3ad04bf",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.environment.set(\"old_user_token\", pm.response.json()[\"idToken\"]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"user\": \"apptest125\",\n\t\"password\": \"Test1234!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://85gs2wfywb.execute-api.us-east-1.amazonaws.com/dev/login",
+							"protocol": "https",
+							"host": [
+								"85gs2wfywb",
+								"execute-api",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "payments",
+			"item": [
+				{
+					"name": "create customer",
+					"item": [
+						{
+							"name": "create customer 400 receive error from soap",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CustomerNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"InstId\": \"ERROR\",\n  \"AccountList\": \"string\",\n  \"Address1\": \"string\",\n  \"Address2\": \"string\",\n  \"Address3\": \"string\",\n  \"Address4\": \"string\",\n  \"Address5\": \"string\",\n  \"Address6\": \"string\",\n  \"AltAddress1\": \"string\",\n  \"AltAddress2\": \"string\",\n  \"AltAddress3\": \"string\",\n  \"AltAddress4\": \"string\",\n  \"AltAddress5\": \"string\",\n  \"AltAddress6\": \"string\",\n  \"AltCity\": \"Warszawa\",\n  \"AltCountry\": \"Poland\",\n  \"AltPostalCode\": \"01-001\",\n  \"AuthA1\": \"string\",\n  \"AuthA2\": \"string\",\n  \"AuthA3\": \"string\",\n  \"AuthQ1\": \"string\",\n  \"AuthQ2\": \"string\",\n  \"AuthQ3\": \"string\",\n  \"BirthDate\": \"1990-01-01\",\n  \"Branch\": \"XXXXXXXXX\",\n  \"BusinessPhone\": \"+4822111111111\",\n  \"Citizenship\": \"string\",\n  \"City\": \"Warsaw\",\n  \"CompanyName\": \"string\",\n  \"Country\": \"Poland\",\n  \"CountryCode\": \"PL\",\n  \"CreditAllowed\": \"Y\",\n  \"CreditScodeAmount\": 1000.42,\n  \"CustomerCategory\": \"string\",\n  \"CustomerInfo\": \"string\",\n  \"CustomerStatus\": \"0\",\n  \"CustomerType\": \"1\",\n  \"DigiPassSerialNo\": \"XXXXXXXXXXXX\",\n  \"DrvLicNo\": \"string\",\n  \"EmailHome\": \"ber@ga.com\",\n  \"EmailWork\": \"ber@ga.com\",\n  \"EmbossedName\": \"string\",\n  \"EmbossedNameLong\": \"string\",\n  \"Felt1\": \"string\",\n  \"FirstName\": \"John\",\n  \"GeoCode\": \"9616\",\n  \"IndustryCode\": 0,\n  \"Language\": \"pl\",\n  \"LastName\": \"Doe\",\n  \"LegalCustomer\": true,\n  \"MakeCheckSts\": 1,\n  \"Memo\": \"string\",\n  \"MobilePhone\": \"+48602602602\",\n  \"PassportNo\": \"XXXXXXXXXX\",\n  \"PostalCode\": \"01-001\",\n  \"RelManagerEmail\": \"manager@example.com\",\n  \"RelManagerName\": \"John Doe\",\n  \"RelManagerTlf\": \"+48602602602\",\n  \"ScoreDate\": \"2019-01-01\",\n  \"SectorCode\": 10,\n  \"SignatureCardDate\": \"2019-01-01\",\n  \"SignaturRef\": 1234,\n  \"TDSecure\": \"string\",\n  \"Title\": \"Mr.\",\n  \"Tlf\": \"+48602602602\",\n  \"VIPsts\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/customers",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create customer with user existed in lpc backend",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "abcde12345",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CustomerNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"AccountList\": \"string\",\n  \"Address1\": \"string\",\n  \"Address2\": \"string\",\n  \"Address3\": \"string\",\n  \"Address4\": \"string\",\n  \"Address5\": \"string\",\n  \"Address6\": \"string\",\n  \"AltAddress1\": \"string\",\n  \"AltAddress2\": \"string\",\n  \"AltAddress3\": \"string\",\n  \"AltAddress4\": \"string\",\n  \"AltAddress5\": \"string\",\n  \"AltAddress6\": \"string\",\n  \"AltCity\": \"Warszawa\",\n  \"AltCountry\": \"Poland\",\n  \"AltPostalCode\": \"01-001\",\n  \"AuthA1\": \"string\",\n  \"AuthA2\": \"string\",\n  \"AuthA3\": \"string\",\n  \"AuthQ1\": \"string\",\n  \"AuthQ2\": \"string\",\n  \"AuthQ3\": \"string\",\n  \"BirthDate\": \"1990-01-01\",\n  \"Branch\": \"XXXXXXXXX\",\n  \"BusinessPhone\": \"+4822111111111\",\n  \"Citizenship\": \"string\",\n  \"City\": \"Warsaw\",\n  \"CompanyName\": \"string\",\n  \"Country\": \"Poland\",\n  \"CountryCode\": \"PL\",\n  \"CreditAllowed\": \"Y\",\n  \"CreditScodeAmount\": 1000.42,\n  \"CustomerCategory\": \"string\",\n  \"CustomerInfo\": \"string\",\n  \"CustomerStatus\": \"0\",\n  \"CustomerType\": \"1\",\n  \"DigiPassSerialNo\": \"XXXXXXXXXXXX\",\n  \"DrvLicNo\": \"string\",\n  \"EmailHome\": \"ber@ga.com\",\n  \"EmailWork\": \"ber@ga.com\",\n  \"EmbossedName\": \"string\",\n  \"EmbossedNameLong\": \"string\",\n  \"Felt1\": \"string\",\n  \"FirstName\": \"John\",\n  \"GeoCode\": \"9616\",\n  \"IndustryCode\": 0,\n  \"Language\": \"pl\",\n  \"LastName\": \"Doe\",\n  \"LegalCustomer\": true,\n  \"MakeCheckSts\": 1,\n  \"Memo\": \"string\",\n  \"MobilePhone\": \"+48602602602\",\n  \"PassportNo\": \"XXXXXXXXXX\",\n  \"PostalCode\": \"01-001\",\n  \"RelManagerEmail\": \"manager@example.com\",\n  \"RelManagerName\": \"John Doe\",\n  \"RelManagerTlf\": \"+48602602602\",\n  \"ScoreDate\": \"2019-01-01\",\n  \"SectorCode\": 10,\n  \"SignatureCardDate\": \"2019-01-01\",\n  \"SignaturRef\": 1234,\n  \"TDSecure\": \"string\",\n  \"Title\": \"Mr.\",\n  \"Tlf\": \"+48602602602\",\n  \"VIPsts\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/customers",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create customer for new user",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CustomerNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"AccountList\": \"string\",\n  \"Address1\": \"string\",\n  \"Address2\": \"string\",\n  \"Address3\": \"string\",\n  \"Address4\": \"string\",\n  \"Address5\": \"string\",\n  \"Address6\": \"string\",\n  \"AltAddress1\": \"string\",\n  \"AltAddress2\": \"string\",\n  \"AltAddress3\": \"string\",\n  \"AltAddress4\": \"string\",\n  \"AltAddress5\": \"string\",\n  \"AltAddress6\": \"string\",\n  \"AltCity\": \"Warszawa\",\n  \"AltCountry\": \"Poland\",\n  \"AltPostalCode\": \"01-001\",\n  \"AuthA1\": \"string\",\n  \"AuthA2\": \"string\",\n  \"AuthA3\": \"string\",\n  \"AuthQ1\": \"string\",\n  \"AuthQ2\": \"string\",\n  \"AuthQ3\": \"string\",\n  \"BirthDate\": \"1990-01-01\",\n  \"Branch\": \"XXXXXXXXX\",\n  \"BusinessPhone\": \"+4822111111111\",\n  \"Citizenship\": \"string\",\n  \"City\": \"Warsaw\",\n  \"CompanyName\": \"string\",\n  \"Country\": \"Poland\",\n  \"CountryCode\": \"PL\",\n  \"CreditAllowed\": \"Y\",\n  \"CreditScodeAmount\": 1000.42,\n  \"CustomerCategory\": \"string\",\n  \"CustomerInfo\": \"string\",\n  \"CustomerStatus\": \"0\",\n  \"CustomerType\": \"1\",\n  \"DigiPassSerialNo\": \"XXXXXXXXXXXX\",\n  \"DrvLicNo\": \"string\",\n  \"EmailHome\": \"ber@ga.com\",\n  \"EmailWork\": \"ber@ga.com\",\n  \"EmbossedName\": \"string\",\n  \"EmbossedNameLong\": \"string\",\n  \"Felt1\": \"string\",\n  \"FirstName\": \"John\",\n  \"GeoCode\": \"9616\",\n  \"IndustryCode\": 0,\n  \"Language\": \"pl\",\n  \"LastName\": \"Doe\",\n  \"LegalCustomer\": true,\n  \"MakeCheckSts\": 1,\n  \"Memo\": \"string\",\n  \"MobilePhone\": \"+48602602602\",\n  \"PassportNo\": \"XXXXXXXXXX\",\n  \"PostalCode\": \"01-001\",\n  \"RelManagerEmail\": \"manager@example.com\",\n  \"RelManagerName\": \"John Doe\",\n  \"RelManagerTlf\": \"+48602602602\",\n  \"ScoreDate\": \"2019-01-01\",\n  \"SectorCode\": 10,\n  \"SignatureCardDate\": \"2019-01-01\",\n  \"SignaturRef\": 1234,\n  \"TDSecure\": \"string\",\n  \"Title\": \"Mr.\",\n  \"Tlf\": \"+48602602602\",\n  \"VIPsts\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/customers",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create customer 400 incorrect tenant id",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde123456"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CustomerNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"AccountList\": \"string\",\n  \"Address1\": \"string\",\n  \"Address2\": \"string\",\n  \"Address3\": \"string\",\n  \"Address4\": \"string\",\n  \"Address5\": \"string\",\n  \"Address6\": \"string\",\n  \"AltAddress1\": \"string\",\n  \"AltAddress2\": \"string\",\n  \"AltAddress3\": \"string\",\n  \"AltAddress4\": \"string\",\n  \"AltAddress5\": \"string\",\n  \"AltAddress6\": \"string\",\n  \"AltCity\": \"Warszawa\",\n  \"AltCountry\": \"Poland\",\n  \"AltPostalCode\": \"01-001\",\n  \"AuthA1\": \"string\",\n  \"AuthA2\": \"string\",\n  \"AuthA3\": \"string\",\n  \"AuthQ1\": \"string\",\n  \"AuthQ2\": \"string\",\n  \"AuthQ3\": \"string\",\n  \"BirthDate\": \"1990-01-01\",\n  \"Branch\": \"XXXXXXXXX\",\n  \"BusinessPhone\": \"+4822111111111\",\n  \"Citizenship\": \"string\",\n  \"City\": \"Warsaw\",\n  \"CompanyName\": \"string\",\n  \"Country\": \"Poland\",\n  \"CountryCode\": \"PL\",\n  \"CreditAllowed\": \"Y\",\n  \"CreditScodeAmount\": 1000.42,\n  \"CustomerCategory\": \"string\",\n  \"CustomerInfo\": \"string\",\n  \"CustomerStatus\": \"0\",\n  \"CustomerType\": \"1\",\n  \"DigiPassSerialNo\": \"XXXXXXXXXXXX\",\n  \"DrvLicNo\": \"string\",\n  \"EmailHome\": \"ber@ga.com\",\n  \"EmailWork\": \"ber@ga.com\",\n  \"EmbossedName\": \"string\",\n  \"EmbossedNameLong\": \"string\",\n  \"Felt1\": \"string\",\n  \"FirstName\": \"John\",\n  \"GeoCode\": \"9616\",\n  \"IndustryCode\": 0,\n  \"Language\": \"pl\",\n  \"LastName\": \"Doe\",\n  \"LegalCustomer\": true,\n  \"MakeCheckSts\": 1,\n  \"Memo\": \"string\",\n  \"MobilePhone\": \"+48602602602\",\n  \"PassportNo\": \"XXXXXXXXXX\",\n  \"PostalCode\": \"01-001\",\n  \"RelManagerEmail\": \"manager@example.com\",\n  \"RelManagerName\": \"John Doe\",\n  \"RelManagerTlf\": \"+48602602602\",\n  \"ScoreDate\": \"2019-01-01\",\n  \"SectorCode\": 10,\n  \"SignatureCardDate\": \"2019-01-01\",\n  \"SignaturRef\": 1234,\n  \"TDSecure\": \"string\",\n  \"Title\": \"Mr.\",\n  \"Tlf\": \"+48602602602\",\n  \"VIPsts\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/customers",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create customer 400 missing CustomerNo",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"InstId\": \"XXXXXXXXX\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/customers",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create customer 401 missing tenant id",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CustomerNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"AccountList\": \"string\",\n  \"Address1\": \"string\",\n  \"Address2\": \"string\",\n  \"Address3\": \"string\",\n  \"Address4\": \"string\",\n  \"Address5\": \"string\",\n  \"Address6\": \"string\",\n  \"AltAddress1\": \"string\",\n  \"AltAddress2\": \"string\",\n  \"AltAddress3\": \"string\",\n  \"AltAddress4\": \"string\",\n  \"AltAddress5\": \"string\",\n  \"AltAddress6\": \"string\",\n  \"AltCity\": \"Warszawa\",\n  \"AltCountry\": \"Poland\",\n  \"AltPostalCode\": \"01-001\",\n  \"AuthA1\": \"string\",\n  \"AuthA2\": \"string\",\n  \"AuthA3\": \"string\",\n  \"AuthQ1\": \"string\",\n  \"AuthQ2\": \"string\",\n  \"AuthQ3\": \"string\",\n  \"BirthDate\": \"1990-01-01\",\n  \"Branch\": \"XXXXXXXXX\",\n  \"BusinessPhone\": \"+4822111111111\",\n  \"Citizenship\": \"string\",\n  \"City\": \"Warsaw\",\n  \"CompanyName\": \"string\",\n  \"Country\": \"Poland\",\n  \"CountryCode\": \"PL\",\n  \"CreditAllowed\": \"Y\",\n  \"CreditScodeAmount\": 1000.42,\n  \"CustomerCategory\": \"string\",\n  \"CustomerInfo\": \"string\",\n  \"CustomerStatus\": \"0\",\n  \"CustomerType\": \"1\",\n  \"DigiPassSerialNo\": \"XXXXXXXXXXXX\",\n  \"DrvLicNo\": \"string\",\n  \"EmailHome\": \"ber@ga.com\",\n  \"EmailWork\": \"ber@ga.com\",\n  \"EmbossedName\": \"string\",\n  \"EmbossedNameLong\": \"string\",\n  \"Felt1\": \"string\",\n  \"FirstName\": \"John\",\n  \"GeoCode\": \"9616\",\n  \"IndustryCode\": 0,\n  \"Language\": \"pl\",\n  \"LastName\": \"Doe\",\n  \"LegalCustomer\": true,\n  \"MakeCheckSts\": 1,\n  \"Memo\": \"string\",\n  \"MobilePhone\": \"+48602602602\",\n  \"PassportNo\": \"XXXXXXXXXX\",\n  \"PostalCode\": \"01-001\",\n  \"RelManagerEmail\": \"manager@example.com\",\n  \"RelManagerName\": \"John Doe\",\n  \"RelManagerTlf\": \"+48602602602\",\n  \"ScoreDate\": \"2019-01-01\",\n  \"SectorCode\": 10,\n  \"SignatureCardDate\": \"2019-01-01\",\n  \"SignaturRef\": 1234,\n  \"TDSecure\": \"string\",\n  \"Title\": \"Mr.\",\n  \"Tlf\": \"+48602602602\",\n  \"VIPsts\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/customers",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create customer 401 no auth token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde123456"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CustomerNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"AccountList\": \"string\",\n  \"Address1\": \"string\",\n  \"Address2\": \"string\",\n  \"Address3\": \"string\",\n  \"Address4\": \"string\",\n  \"Address5\": \"string\",\n  \"Address6\": \"string\",\n  \"AltAddress1\": \"string\",\n  \"AltAddress2\": \"string\",\n  \"AltAddress3\": \"string\",\n  \"AltAddress4\": \"string\",\n  \"AltAddress5\": \"string\",\n  \"AltAddress6\": \"string\",\n  \"AltCity\": \"Warszawa\",\n  \"AltCountry\": \"Poland\",\n  \"AltPostalCode\": \"01-001\",\n  \"AuthA1\": \"string\",\n  \"AuthA2\": \"string\",\n  \"AuthA3\": \"string\",\n  \"AuthQ1\": \"string\",\n  \"AuthQ2\": \"string\",\n  \"AuthQ3\": \"string\",\n  \"BirthDate\": \"1990-01-01\",\n  \"Branch\": \"XXXXXXXXX\",\n  \"BusinessPhone\": \"+4822111111111\",\n  \"Citizenship\": \"string\",\n  \"City\": \"Warsaw\",\n  \"CompanyName\": \"string\",\n  \"Country\": \"Poland\",\n  \"CountryCode\": \"PL\",\n  \"CreditAllowed\": \"Y\",\n  \"CreditScodeAmount\": 1000.42,\n  \"CustomerCategory\": \"string\",\n  \"CustomerInfo\": \"string\",\n  \"CustomerStatus\": \"0\",\n  \"CustomerType\": \"1\",\n  \"DigiPassSerialNo\": \"XXXXXXXXXXXX\",\n  \"DrvLicNo\": \"string\",\n  \"EmailHome\": \"ber@ga.com\",\n  \"EmailWork\": \"ber@ga.com\",\n  \"EmbossedName\": \"string\",\n  \"EmbossedNameLong\": \"string\",\n  \"Felt1\": \"string\",\n  \"FirstName\": \"John\",\n  \"GeoCode\": \"9616\",\n  \"IndustryCode\": 0,\n  \"Language\": \"pl\",\n  \"LastName\": \"Doe\",\n  \"LegalCustomer\": true,\n  \"MakeCheckSts\": 1,\n  \"Memo\": \"string\",\n  \"MobilePhone\": \"+48602602602\",\n  \"PassportNo\": \"XXXXXXXXXX\",\n  \"PostalCode\": \"01-001\",\n  \"RelManagerEmail\": \"manager@example.com\",\n  \"RelManagerName\": \"John Doe\",\n  \"RelManagerTlf\": \"+48602602602\",\n  \"ScoreDate\": \"2019-01-01\",\n  \"SectorCode\": 10,\n  \"SignatureCardDate\": \"2019-01-01\",\n  \"SignaturRef\": 1234,\n  \"TDSecure\": \"string\",\n  \"Title\": \"Mr.\",\n  \"Tlf\": \"+48602602602\",\n  \"VIPsts\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/customers",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create customer 401 invalid token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde123456"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{invalid_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CustomerNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"AccountList\": \"string\",\n  \"Address1\": \"string\",\n  \"Address2\": \"string\",\n  \"Address3\": \"string\",\n  \"Address4\": \"string\",\n  \"Address5\": \"string\",\n  \"Address6\": \"string\",\n  \"AltAddress1\": \"string\",\n  \"AltAddress2\": \"string\",\n  \"AltAddress3\": \"string\",\n  \"AltAddress4\": \"string\",\n  \"AltAddress5\": \"string\",\n  \"AltAddress6\": \"string\",\n  \"AltCity\": \"Warszawa\",\n  \"AltCountry\": \"Poland\",\n  \"AltPostalCode\": \"01-001\",\n  \"AuthA1\": \"string\",\n  \"AuthA2\": \"string\",\n  \"AuthA3\": \"string\",\n  \"AuthQ1\": \"string\",\n  \"AuthQ2\": \"string\",\n  \"AuthQ3\": \"string\",\n  \"BirthDate\": \"1990-01-01\",\n  \"Branch\": \"XXXXXXXXX\",\n  \"BusinessPhone\": \"+4822111111111\",\n  \"Citizenship\": \"string\",\n  \"City\": \"Warsaw\",\n  \"CompanyName\": \"string\",\n  \"Country\": \"Poland\",\n  \"CountryCode\": \"PL\",\n  \"CreditAllowed\": \"Y\",\n  \"CreditScodeAmount\": 1000.42,\n  \"CustomerCategory\": \"string\",\n  \"CustomerInfo\": \"string\",\n  \"CustomerStatus\": \"0\",\n  \"CustomerType\": \"1\",\n  \"DigiPassSerialNo\": \"XXXXXXXXXXXX\",\n  \"DrvLicNo\": \"string\",\n  \"EmailHome\": \"ber@ga.com\",\n  \"EmailWork\": \"ber@ga.com\",\n  \"EmbossedName\": \"string\",\n  \"EmbossedNameLong\": \"string\",\n  \"Felt1\": \"string\",\n  \"FirstName\": \"John\",\n  \"GeoCode\": \"9616\",\n  \"IndustryCode\": 0,\n  \"Language\": \"pl\",\n  \"LastName\": \"Doe\",\n  \"LegalCustomer\": true,\n  \"MakeCheckSts\": 1,\n  \"Memo\": \"string\",\n  \"MobilePhone\": \"+48602602602\",\n  \"PassportNo\": \"XXXXXXXXXX\",\n  \"PostalCode\": \"01-001\",\n  \"RelManagerEmail\": \"manager@example.com\",\n  \"RelManagerName\": \"John Doe\",\n  \"RelManagerTlf\": \"+48602602602\",\n  \"ScoreDate\": \"2019-01-01\",\n  \"SectorCode\": 10,\n  \"SignatureCardDate\": \"2019-01-01\",\n  \"SignaturRef\": 1234,\n  \"TDSecure\": \"string\",\n  \"Title\": \"Mr.\",\n  \"Tlf\": \"+48602602602\",\n  \"VIPsts\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/customers",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create customer 401 expired token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde123456"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{expired_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CustomerNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"AccountList\": \"string\",\n  \"Address1\": \"string\",\n  \"Address2\": \"string\",\n  \"Address3\": \"string\",\n  \"Address4\": \"string\",\n  \"Address5\": \"string\",\n  \"Address6\": \"string\",\n  \"AltAddress1\": \"string\",\n  \"AltAddress2\": \"string\",\n  \"AltAddress3\": \"string\",\n  \"AltAddress4\": \"string\",\n  \"AltAddress5\": \"string\",\n  \"AltAddress6\": \"string\",\n  \"AltCity\": \"Warszawa\",\n  \"AltCountry\": \"Poland\",\n  \"AltPostalCode\": \"01-001\",\n  \"AuthA1\": \"string\",\n  \"AuthA2\": \"string\",\n  \"AuthA3\": \"string\",\n  \"AuthQ1\": \"string\",\n  \"AuthQ2\": \"string\",\n  \"AuthQ3\": \"string\",\n  \"BirthDate\": \"1990-01-01\",\n  \"Branch\": \"XXXXXXXXX\",\n  \"BusinessPhone\": \"+4822111111111\",\n  \"Citizenship\": \"string\",\n  \"City\": \"Warsaw\",\n  \"CompanyName\": \"string\",\n  \"Country\": \"Poland\",\n  \"CountryCode\": \"PL\",\n  \"CreditAllowed\": \"Y\",\n  \"CreditScodeAmount\": 1000.42,\n  \"CustomerCategory\": \"string\",\n  \"CustomerInfo\": \"string\",\n  \"CustomerStatus\": \"0\",\n  \"CustomerType\": \"1\",\n  \"DigiPassSerialNo\": \"XXXXXXXXXXXX\",\n  \"DrvLicNo\": \"string\",\n  \"EmailHome\": \"ber@ga.com\",\n  \"EmailWork\": \"ber@ga.com\",\n  \"EmbossedName\": \"string\",\n  \"EmbossedNameLong\": \"string\",\n  \"Felt1\": \"string\",\n  \"FirstName\": \"John\",\n  \"GeoCode\": \"9616\",\n  \"IndustryCode\": 0,\n  \"Language\": \"pl\",\n  \"LastName\": \"Doe\",\n  \"LegalCustomer\": true,\n  \"MakeCheckSts\": 1,\n  \"Memo\": \"string\",\n  \"MobilePhone\": \"+48602602602\",\n  \"PassportNo\": \"XXXXXXXXXX\",\n  \"PostalCode\": \"01-001\",\n  \"RelManagerEmail\": \"manager@example.com\",\n  \"RelManagerName\": \"John Doe\",\n  \"RelManagerTlf\": \"+48602602602\",\n  \"ScoreDate\": \"2019-01-01\",\n  \"SectorCode\": 10,\n  \"SignatureCardDate\": \"2019-01-01\",\n  \"SignaturRef\": 1234,\n  \"TDSecure\": \"string\",\n  \"Title\": \"Mr.\",\n  \"Tlf\": \"+48602602602\",\n  \"VIPsts\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/customers",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create customer 401 not jwt token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde123456"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "invalid"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CustomerNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"AccountList\": \"string\",\n  \"Address1\": \"string\",\n  \"Address2\": \"string\",\n  \"Address3\": \"string\",\n  \"Address4\": \"string\",\n  \"Address5\": \"string\",\n  \"Address6\": \"string\",\n  \"AltAddress1\": \"string\",\n  \"AltAddress2\": \"string\",\n  \"AltAddress3\": \"string\",\n  \"AltAddress4\": \"string\",\n  \"AltAddress5\": \"string\",\n  \"AltAddress6\": \"string\",\n  \"AltCity\": \"Warszawa\",\n  \"AltCountry\": \"Poland\",\n  \"AltPostalCode\": \"01-001\",\n  \"AuthA1\": \"string\",\n  \"AuthA2\": \"string\",\n  \"AuthA3\": \"string\",\n  \"AuthQ1\": \"string\",\n  \"AuthQ2\": \"string\",\n  \"AuthQ3\": \"string\",\n  \"BirthDate\": \"1990-01-01\",\n  \"Branch\": \"XXXXXXXXX\",\n  \"BusinessPhone\": \"+4822111111111\",\n  \"Citizenship\": \"string\",\n  \"City\": \"Warsaw\",\n  \"CompanyName\": \"string\",\n  \"Country\": \"Poland\",\n  \"CountryCode\": \"PL\",\n  \"CreditAllowed\": \"Y\",\n  \"CreditScodeAmount\": 1000.42,\n  \"CustomerCategory\": \"string\",\n  \"CustomerInfo\": \"string\",\n  \"CustomerStatus\": \"0\",\n  \"CustomerType\": \"1\",\n  \"DigiPassSerialNo\": \"XXXXXXXXXXXX\",\n  \"DrvLicNo\": \"string\",\n  \"EmailHome\": \"ber@ga.com\",\n  \"EmailWork\": \"ber@ga.com\",\n  \"EmbossedName\": \"string\",\n  \"EmbossedNameLong\": \"string\",\n  \"Felt1\": \"string\",\n  \"FirstName\": \"John\",\n  \"GeoCode\": \"9616\",\n  \"IndustryCode\": 0,\n  \"Language\": \"pl\",\n  \"LastName\": \"Doe\",\n  \"LegalCustomer\": true,\n  \"MakeCheckSts\": 1,\n  \"Memo\": \"string\",\n  \"MobilePhone\": \"+48602602602\",\n  \"PassportNo\": \"XXXXXXXXXX\",\n  \"PostalCode\": \"01-001\",\n  \"RelManagerEmail\": \"manager@example.com\",\n  \"RelManagerName\": \"John Doe\",\n  \"RelManagerTlf\": \"+48602602602\",\n  \"ScoreDate\": \"2019-01-01\",\n  \"SectorCode\": 10,\n  \"SignatureCardDate\": \"2019-01-01\",\n  \"SignaturRef\": 1234,\n  \"TDSecure\": \"string\",\n  \"Title\": \"Mr.\",\n  \"Tlf\": \"+48602602602\",\n  \"VIPsts\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/customers",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create customer 409",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{old_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12346"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CustomerNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"AccountList\": \"string\",\n  \"Address1\": \"string\",\n  \"Address2\": \"string\",\n  \"Address3\": \"string\",\n  \"Address4\": \"string\",\n  \"Address5\": \"string\",\n  \"Address6\": \"string\",\n  \"AltAddress1\": \"string\",\n  \"AltAddress2\": \"string\",\n  \"AltAddress3\": \"string\",\n  \"AltAddress4\": \"string\",\n  \"AltAddress5\": \"string\",\n  \"AltAddress6\": \"string\",\n  \"AltCity\": \"Warszawa\",\n  \"AltCountry\": \"Poland\",\n  \"AltPostalCode\": \"01-001\",\n  \"AuthA1\": \"string\",\n  \"AuthA2\": \"string\",\n  \"AuthA3\": \"string\",\n  \"AuthQ1\": \"string\",\n  \"AuthQ2\": \"string\",\n  \"AuthQ3\": \"string\",\n  \"BirthDate\": \"1990-01-01\",\n  \"Branch\": \"XXXXXXXXX\",\n  \"BusinessPhone\": \"+4822111111111\",\n  \"Citizenship\": \"string\",\n  \"City\": \"Warsaw\",\n  \"CompanyName\": \"string\",\n  \"Country\": \"Poland\",\n  \"CountryCode\": \"PL\",\n  \"CreditAllowed\": \"Y\",\n  \"CreditScodeAmount\": 1000.42,\n  \"CustomerCategory\": \"string\",\n  \"CustomerInfo\": \"string\",\n  \"CustomerStatus\": \"0\",\n  \"CustomerType\": \"1\",\n  \"DigiPassSerialNo\": \"XXXXXXXXXXXX\",\n  \"DrvLicNo\": \"string\",\n  \"EmailHome\": \"ber@ga.com\",\n  \"EmailWork\": \"ber@ga.com\",\n  \"EmbossedName\": \"string\",\n  \"EmbossedNameLong\": \"string\",\n  \"Felt1\": \"string\",\n  \"FirstName\": \"John\",\n  \"GeoCode\": \"9616\",\n  \"IndustryCode\": 0,\n  \"Language\": \"pl\",\n  \"LastName\": \"Doe\",\n  \"LegalCustomer\": true,\n  \"MakeCheckSts\": 1,\n  \"Memo\": \"string\",\n  \"MobilePhone\": \"+48602602602\",\n  \"PassportNo\": \"XXXXXXXXXX\",\n  \"PostalCode\": \"01-001\",\n  \"RelManagerEmail\": \"manager@example.com\",\n  \"RelManagerName\": \"John Doe\",\n  \"RelManagerTlf\": \"+48602602602\",\n  \"ScoreDate\": \"2019-01-01\",\n  \"SectorCode\": 10,\n  \"SignatureCardDate\": \"2019-01-01\",\n  \"SignaturRef\": 1234,\n  \"TDSecure\": \"string\",\n  \"Title\": \"Mr.\",\n  \"Tlf\": \"+48602602602\",\n  \"VIPsts\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/customers",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1f2d3f00-a123-4000-92d4-a33faa82dbdd",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "fedec1c8-975f-4e9a-8801-15187b703f48",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "search cards",
+					"item": [
+						{
+							"name": "search cards",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{new_user_token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "12345abcde",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search cards with query",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/cards?page=3&per_page=20&AccountNo=111111111",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "3"
+										},
+										{
+											"key": "per_page",
+											"value": "20"
+										},
+										{
+											"key": "AccountNo",
+											"value": "111111111"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search cards 400 invalid query",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/cards?Option=1000",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									],
+									"query": [
+										{
+											"key": "Option",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search cards 400 invalid pagination",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/cards?page=abcde",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "abcde"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search cards 401, no user with given email and tenant",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde123456"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search cards 401 not jwt token",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "invalid"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde123456"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search cards 401 invalid token",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{invalid_token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "12345abcde",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search cards 401 expired token",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{expired_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search cards 401 no tenant",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search cards 401 no jwt token",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "create card",
+					"item": [
+						{
+							"name": "create card",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{new_user_token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "12345abcde",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CardCity\": \"Warszawa\",\n  \"CardPostalCode\": \"00-001\",\n  \"CustomerId\": 1234,\n  \"CustomerNo\": \"XXXXXXXXXXXX\",\n  \"EmbossedName\": \"string\",\n  \"FirstName\": \"John\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"LastName\": \"Doe\",\n  \"PinCity\": \"Warszawa\",\n  \"PinPostalCode\": \"00-001\",\n  \"ProductId\": 1234,\n  \"ShipmentMethodCard\": \"R\",\n  \"ShipmentMethodPin\": \"R\",\n  \"AccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountNo2\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountOwner\": \"XXXXXXXXXXXX\",\n  \"ActivateFlag\": 0,\n  \"AddrTypeCard\": \"S\",\n  \"AddrTypePin\": \"S\",\n  \"BulkId\": 1234,\n  \"CardAddress1\": \"string\",\n  \"CardAddress2\": \"string\",\n  \"CardAddress3\": \"string\",\n  \"CardAddress4\": \"string\",\n  \"CardAddress5\": \"string\",\n  \"CardAddress6\": \"string\",\n  \"CardCountry\": \"Poland\",\n  \"CardDeliveryBank\": \"string\",\n  \"CardDesignNo\": 0,\n  \"CardFlag\": \"if\",\n  \"CardInfo\": \"string\",\n  \"ChargeAccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"CredLimit\": 0,\n  \"EmbossedName2\": \"string\",\n  \"Expire\": 2208,\n  \"ExtPictureId\": \"string\",\n  \"FeeMonth\": 6,\n  \"MakeCheckSts\": 1,\n  \"Note\": \"string\",\n  \"OrderPurpose\": \"P\",\n  \"OrderType\": \"K\",\n  \"PAmounthLengthSp3\": 0,\n  \"PAmounthSp3\": 0,\n  \"PinAddress1\": \"string\",\n  \"PinAddress2\": \"string\",\n  \"PinAddress3\": \"string\",\n  \"PinAddress4\": \"string\",\n  \"PinAddress5\": \"string\",\n  \"PinAddress6\": \"string\",\n  \"PinCountry\": \"Poland\",\n  \"PinMethod\": \"S\",\n  \"PinName\": \"string\",\n  \"ShipmentDate\": \"2020-01-01T00:00:00.000Z\",\n  \"SIR\": \"XXXXXXXXXXXXXXXX\",\n  \"ValidFromDate\": \"2019-12-01T00:00:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create card 400 invalid CardPostalCode",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CardCity\": \"Warszawa\",\n  \"CardPostalCode\": \"aaaassaaaaaaaaaa\",\n  \"CustomerId\": 1234,\n  \"CustomerNo\": \"XXXXXXXXXXXX\",\n  \"EmbossedName\": \"string\",\n  \"FirstName\": \"John\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"LastName\": \"Doe\",\n  \"PinCity\": \"Warszawa\",\n  \"PinPostalCode\": \"00-001\",\n  \"ProductId\": 1234,\n  \"ShipmentMethodCard\": \"R\",\n  \"ShipmentMethodPin\": \"R\",\n  \"AccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountNo2\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountOwner\": \"XXXXXXXXXXXX\",\n  \"ActivateFlag\": 0,\n  \"AddrTypeCard\": \"S\",\n  \"AddrTypePin\": \"S\",\n  \"BulkId\": 1234,\n  \"CardAddress1\": \"string\",\n  \"CardAddress2\": \"string\",\n  \"CardAddress3\": \"string\",\n  \"CardAddress4\": \"string\",\n  \"CardAddress5\": \"string\",\n  \"CardAddress6\": \"string\",\n  \"CardCountry\": \"Poland\",\n  \"CardDeliveryBank\": \"string\",\n  \"CardDesignNo\": 0,\n  \"CardFlag\": \"if\",\n  \"CardInfo\": \"string\",\n  \"ChargeAccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"CredLimit\": 0,\n  \"EmbossedName2\": \"string\",\n  \"Expire\": 2208,\n  \"ExtPictureId\": \"string\",\n  \"FeeMonth\": 6,\n  \"MakeCheckSts\": 1,\n  \"Note\": \"string\",\n  \"OrderPurpose\": \"P\",\n  \"OrderType\": \"K\",\n  \"PAmounthLengthSp3\": 0,\n  \"PAmounthSp3\": 0,\n  \"PinAddress1\": \"string\",\n  \"PinAddress2\": \"string\",\n  \"PinAddress3\": \"string\",\n  \"PinAddress4\": \"string\",\n  \"PinAddress5\": \"string\",\n  \"PinAddress6\": \"string\",\n  \"PinCountry\": \"Poland\",\n  \"PinMethod\": \"S\",\n  \"PinName\": \"string\",\n  \"ShipmentDate\": \"2020-01-01T00:00:00.000Z\",\n  \"SIR\": \"XXXXXXXXXXXXXXXX\",\n  \"ValidFromDate\": \"2019-12-01T00:00:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create card 400 missing CustomerId",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CardCity\": \"Warszawa\",\n  \"CardPostalCode\": \"00-001\",\n  \"CustomerNo\": \"XXXXXXXXXXXX\",\n  \"EmbossedName\": \"string\",\n  \"FirstName\": \"John\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"LastName\": \"Doe\",\n  \"PinCity\": \"Warszawa\",\n  \"PinPostalCode\": \"00-001\",\n  \"ProductId\": 1234,\n  \"ShipmentMethodCard\": \"R\",\n  \"ShipmentMethodPin\": \"R\",\n  \"AccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountNo2\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountOwner\": \"XXXXXXXXXXXX\",\n  \"ActivateFlag\": 0,\n  \"AddrTypeCard\": \"S\",\n  \"AddrTypePin\": \"S\",\n  \"BulkId\": 1234,\n  \"CardAddress1\": \"string\",\n  \"CardAddress2\": \"string\",\n  \"CardAddress3\": \"string\",\n  \"CardAddress4\": \"string\",\n  \"CardAddress5\": \"string\",\n  \"CardAddress6\": \"string\",\n  \"CardCountry\": \"Poland\",\n  \"CardDeliveryBank\": \"string\",\n  \"CardDesignNo\": 0,\n  \"CardFlag\": \"if\",\n  \"CardInfo\": \"string\",\n  \"ChargeAccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"CredLimit\": 0,\n  \"EmbossedName2\": \"string\",\n  \"Expire\": 2208,\n  \"ExtPictureId\": \"string\",\n  \"FeeMonth\": 6,\n  \"MakeCheckSts\": 1,\n  \"Note\": \"string\",\n  \"OrderPurpose\": \"P\",\n  \"OrderType\": \"K\",\n  \"PAmounthLengthSp3\": 0,\n  \"PAmounthSp3\": 0,\n  \"PinAddress1\": \"string\",\n  \"PinAddress2\": \"string\",\n  \"PinAddress3\": \"string\",\n  \"PinAddress4\": \"string\",\n  \"PinAddress5\": \"string\",\n  \"PinAddress6\": \"string\",\n  \"PinCountry\": \"Poland\",\n  \"PinMethod\": \"S\",\n  \"PinName\": \"string\",\n  \"ShipmentDate\": \"2020-01-01T00:00:00.000Z\",\n  \"SIR\": \"XXXXXXXXXXXXXXXX\",\n  \"ValidFromDate\": \"2019-12-01T00:00:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create card 400 receive error from soap",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CardCity\": \"Warszawa\",\n  \"CardPostalCode\": \"00-001\",\n  \"CustomerId\": 1234,\n  \"CustomerNo\": \"ERROR\",\n  \"EmbossedName\": \"string\",\n  \"FirstName\": \"John\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"LastName\": \"Doe\",\n  \"PinCity\": \"Warszawa\",\n  \"PinPostalCode\": \"00-001\",\n  \"ProductId\": 1234,\n  \"ShipmentMethodCard\": \"R\",\n  \"ShipmentMethodPin\": \"R\",\n  \"AccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountNo2\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountOwner\": \"XXXXXXXXXXXX\",\n  \"ActivateFlag\": 0,\n  \"AddrTypeCard\": \"S\",\n  \"AddrTypePin\": \"S\",\n  \"BulkId\": 1234,\n  \"CardAddress1\": \"string\",\n  \"CardAddress2\": \"string\",\n  \"CardAddress3\": \"string\",\n  \"CardAddress4\": \"string\",\n  \"CardAddress5\": \"string\",\n  \"CardAddress6\": \"string\",\n  \"CardCountry\": \"Poland\",\n  \"CardDeliveryBank\": \"string\",\n  \"CardDesignNo\": 0,\n  \"CardFlag\": \"if\",\n  \"CardInfo\": \"string\",\n  \"ChargeAccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"CredLimit\": 0,\n  \"EmbossedName2\": \"string\",\n  \"Expire\": 2208,\n  \"ExtPictureId\": \"string\",\n  \"FeeMonth\": 6,\n  \"MakeCheckSts\": 1,\n  \"Note\": \"string\",\n  \"OrderPurpose\": \"P\",\n  \"OrderType\": \"K\",\n  \"PAmounthLengthSp3\": 0,\n  \"PAmounthSp3\": 0,\n  \"PinAddress1\": \"string\",\n  \"PinAddress2\": \"string\",\n  \"PinAddress3\": \"string\",\n  \"PinAddress4\": \"string\",\n  \"PinAddress5\": \"string\",\n  \"PinAddress6\": \"string\",\n  \"PinCountry\": \"Poland\",\n  \"PinMethod\": \"S\",\n  \"PinName\": \"string\",\n  \"ShipmentDate\": \"2020-01-01T00:00:00.000Z\",\n  \"SIR\": \"XXXXXXXXXXXXXXXX\",\n  \"ValidFromDate\": \"2019-12-01T00:00:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create card 401 no jwt token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CardCity\": \"Warszawa\",\n  \"CardPostalCode\": \"00-001\",\n  \"CustomerId\": 1234,\n  \"CustomerNo\": \"XXXXXXXXXXXX\",\n  \"EmbossedName\": \"string\",\n  \"FirstName\": \"John\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"LastName\": \"Doe\",\n  \"PinCity\": \"Warszawa\",\n  \"PinPostalCode\": \"00-001\",\n  \"ProductId\": 1234,\n  \"ShipmentMethodCard\": \"R\",\n  \"ShipmentMethodPin\": \"R\",\n  \"AccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountNo2\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountOwner\": \"XXXXXXXXXXXX\",\n  \"ActivateFlag\": 0,\n  \"AddrTypeCard\": \"S\",\n  \"AddrTypePin\": \"S\",\n  \"BulkId\": 1234,\n  \"CardAddress1\": \"string\",\n  \"CardAddress2\": \"string\",\n  \"CardAddress3\": \"string\",\n  \"CardAddress4\": \"string\",\n  \"CardAddress5\": \"string\",\n  \"CardAddress6\": \"string\",\n  \"CardCountry\": \"Poland\",\n  \"CardDeliveryBank\": \"string\",\n  \"CardDesignNo\": 0,\n  \"CardFlag\": \"if\",\n  \"CardInfo\": \"string\",\n  \"ChargeAccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"CredLimit\": 0,\n  \"EmbossedName2\": \"string\",\n  \"Expire\": 2208,\n  \"ExtPictureId\": \"string\",\n  \"FeeMonth\": 6,\n  \"MakeCheckSts\": 1,\n  \"Note\": \"string\",\n  \"OrderPurpose\": \"P\",\n  \"OrderType\": \"K\",\n  \"PAmounthLengthSp3\": 0,\n  \"PAmounthSp3\": 0,\n  \"PinAddress1\": \"string\",\n  \"PinAddress2\": \"string\",\n  \"PinAddress3\": \"string\",\n  \"PinAddress4\": \"string\",\n  \"PinAddress5\": \"string\",\n  \"PinAddress6\": \"string\",\n  \"PinCountry\": \"Poland\",\n  \"PinMethod\": \"S\",\n  \"PinName\": \"string\",\n  \"ShipmentDate\": \"2020-01-01T00:00:00.000Z\",\n  \"SIR\": \"XXXXXXXXXXXXXXXX\",\n  \"ValidFromDate\": \"2019-12-01T00:00:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create card 401 no tenant",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CardCity\": \"Warszawa\",\n  \"CardPostalCode\": \"00-001\",\n  \"CustomerId\": 1234,\n  \"CustomerNo\": \"XXXXXXXXXXXX\",\n  \"EmbossedName\": \"string\",\n  \"FirstName\": \"John\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"LastName\": \"Doe\",\n  \"PinCity\": \"Warszawa\",\n  \"PinPostalCode\": \"00-001\",\n  \"ProductId\": 1234,\n  \"ShipmentMethodCard\": \"R\",\n  \"ShipmentMethodPin\": \"R\",\n  \"AccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountNo2\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountOwner\": \"XXXXXXXXXXXX\",\n  \"ActivateFlag\": 0,\n  \"AddrTypeCard\": \"S\",\n  \"AddrTypePin\": \"S\",\n  \"BulkId\": 1234,\n  \"CardAddress1\": \"string\",\n  \"CardAddress2\": \"string\",\n  \"CardAddress3\": \"string\",\n  \"CardAddress4\": \"string\",\n  \"CardAddress5\": \"string\",\n  \"CardAddress6\": \"string\",\n  \"CardCountry\": \"Poland\",\n  \"CardDeliveryBank\": \"string\",\n  \"CardDesignNo\": 0,\n  \"CardFlag\": \"if\",\n  \"CardInfo\": \"string\",\n  \"ChargeAccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"CredLimit\": 0,\n  \"EmbossedName2\": \"string\",\n  \"Expire\": 2208,\n  \"ExtPictureId\": \"string\",\n  \"FeeMonth\": 6,\n  \"MakeCheckSts\": 1,\n  \"Note\": \"string\",\n  \"OrderPurpose\": \"P\",\n  \"OrderType\": \"K\",\n  \"PAmounthLengthSp3\": 0,\n  \"PAmounthSp3\": 0,\n  \"PinAddress1\": \"string\",\n  \"PinAddress2\": \"string\",\n  \"PinAddress3\": \"string\",\n  \"PinAddress4\": \"string\",\n  \"PinAddress5\": \"string\",\n  \"PinAddress6\": \"string\",\n  \"PinCountry\": \"Poland\",\n  \"PinMethod\": \"S\",\n  \"PinName\": \"string\",\n  \"ShipmentDate\": \"2020-01-01T00:00:00.000Z\",\n  \"SIR\": \"XXXXXXXXXXXXXXXX\",\n  \"ValidFromDate\": \"2019-12-01T00:00:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create card 401 invalid token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{invalid_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CardCity\": \"Warszawa\",\n  \"CardPostalCode\": \"00-001\",\n  \"CustomerId\": 1234,\n  \"CustomerNo\": \"XXXXXXXXXXXX\",\n  \"EmbossedName\": \"string\",\n  \"FirstName\": \"John\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"LastName\": \"Doe\",\n  \"PinCity\": \"Warszawa\",\n  \"PinPostalCode\": \"00-001\",\n  \"ProductId\": 1234,\n  \"ShipmentMethodCard\": \"R\",\n  \"ShipmentMethodPin\": \"R\",\n  \"AccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountNo2\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountOwner\": \"XXXXXXXXXXXX\",\n  \"ActivateFlag\": 0,\n  \"AddrTypeCard\": \"S\",\n  \"AddrTypePin\": \"S\",\n  \"BulkId\": 1234,\n  \"CardAddress1\": \"string\",\n  \"CardAddress2\": \"string\",\n  \"CardAddress3\": \"string\",\n  \"CardAddress4\": \"string\",\n  \"CardAddress5\": \"string\",\n  \"CardAddress6\": \"string\",\n  \"CardCountry\": \"Poland\",\n  \"CardDeliveryBank\": \"string\",\n  \"CardDesignNo\": 0,\n  \"CardFlag\": \"if\",\n  \"CardInfo\": \"string\",\n  \"ChargeAccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"CredLimit\": 0,\n  \"EmbossedName2\": \"string\",\n  \"Expire\": 2208,\n  \"ExtPictureId\": \"string\",\n  \"FeeMonth\": 6,\n  \"MakeCheckSts\": 1,\n  \"Note\": \"string\",\n  \"OrderPurpose\": \"P\",\n  \"OrderType\": \"K\",\n  \"PAmounthLengthSp3\": 0,\n  \"PAmounthSp3\": 0,\n  \"PinAddress1\": \"string\",\n  \"PinAddress2\": \"string\",\n  \"PinAddress3\": \"string\",\n  \"PinAddress4\": \"string\",\n  \"PinAddress5\": \"string\",\n  \"PinAddress6\": \"string\",\n  \"PinCountry\": \"Poland\",\n  \"PinMethod\": \"S\",\n  \"PinName\": \"string\",\n  \"ShipmentDate\": \"2020-01-01T00:00:00.000Z\",\n  \"SIR\": \"XXXXXXXXXXXXXXXX\",\n  \"ValidFromDate\": \"2019-12-01T00:00:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create card 401 no user with given email and tenant",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcdefg"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CardCity\": \"Warszawa\",\n  \"CardPostalCode\": \"00-001\",\n  \"CustomerId\": 1234,\n  \"CustomerNo\": \"XXXXXXXXXXXX\",\n  \"EmbossedName\": \"string\",\n  \"FirstName\": \"John\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"LastName\": \"Doe\",\n  \"PinCity\": \"Warszawa\",\n  \"PinPostalCode\": \"00-001\",\n  \"ProductId\": 1234,\n  \"ShipmentMethodCard\": \"R\",\n  \"ShipmentMethodPin\": \"R\",\n  \"AccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountNo2\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountOwner\": \"XXXXXXXXXXXX\",\n  \"ActivateFlag\": 0,\n  \"AddrTypeCard\": \"S\",\n  \"AddrTypePin\": \"S\",\n  \"BulkId\": 1234,\n  \"CardAddress1\": \"string\",\n  \"CardAddress2\": \"string\",\n  \"CardAddress3\": \"string\",\n  \"CardAddress4\": \"string\",\n  \"CardAddress5\": \"string\",\n  \"CardAddress6\": \"string\",\n  \"CardCountry\": \"Poland\",\n  \"CardDeliveryBank\": \"string\",\n  \"CardDesignNo\": 0,\n  \"CardFlag\": \"if\",\n  \"CardInfo\": \"string\",\n  \"ChargeAccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"CredLimit\": 0,\n  \"EmbossedName2\": \"string\",\n  \"Expire\": 2208,\n  \"ExtPictureId\": \"string\",\n  \"FeeMonth\": 6,\n  \"MakeCheckSts\": 1,\n  \"Note\": \"string\",\n  \"OrderPurpose\": \"P\",\n  \"OrderType\": \"K\",\n  \"PAmounthLengthSp3\": 0,\n  \"PAmounthSp3\": 0,\n  \"PinAddress1\": \"string\",\n  \"PinAddress2\": \"string\",\n  \"PinAddress3\": \"string\",\n  \"PinAddress4\": \"string\",\n  \"PinAddress5\": \"string\",\n  \"PinAddress6\": \"string\",\n  \"PinCountry\": \"Poland\",\n  \"PinMethod\": \"S\",\n  \"PinName\": \"string\",\n  \"ShipmentDate\": \"2020-01-01T00:00:00.000Z\",\n  \"SIR\": \"XXXXXXXXXXXXXXXX\",\n  \"ValidFromDate\": \"2019-12-01T00:00:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create card 401 expired token",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{expired_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"CardCity\": \"Warszawa\",\n  \"CardPostalCode\": \"00-001\",\n  \"CustomerId\": 1234,\n  \"CustomerNo\": \"XXXXXXXXXXXX\",\n  \"EmbossedName\": \"string\",\n  \"FirstName\": \"John\",\n  \"InstId\": \"XXXXXXXXX\",\n  \"LastName\": \"Doe\",\n  \"PinCity\": \"Warszawa\",\n  \"PinPostalCode\": \"00-001\",\n  \"ProductId\": 1234,\n  \"ShipmentMethodCard\": \"R\",\n  \"ShipmentMethodPin\": \"R\",\n  \"AccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountNo2\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"AccountOwner\": \"XXXXXXXXXXXX\",\n  \"ActivateFlag\": 0,\n  \"AddrTypeCard\": \"S\",\n  \"AddrTypePin\": \"S\",\n  \"BulkId\": 1234,\n  \"CardAddress1\": \"string\",\n  \"CardAddress2\": \"string\",\n  \"CardAddress3\": \"string\",\n  \"CardAddress4\": \"string\",\n  \"CardAddress5\": \"string\",\n  \"CardAddress6\": \"string\",\n  \"CardCountry\": \"Poland\",\n  \"CardDeliveryBank\": \"string\",\n  \"CardDesignNo\": 0,\n  \"CardFlag\": \"if\",\n  \"CardInfo\": \"string\",\n  \"ChargeAccountNo\": \"XXXXXXXXXXXXXXXXXXXXXXXXXXXX\",\n  \"CredLimit\": 0,\n  \"EmbossedName2\": \"string\",\n  \"Expire\": 2208,\n  \"ExtPictureId\": \"string\",\n  \"FeeMonth\": 6,\n  \"MakeCheckSts\": 1,\n  \"Note\": \"string\",\n  \"OrderPurpose\": \"P\",\n  \"OrderType\": \"K\",\n  \"PAmounthLengthSp3\": 0,\n  \"PAmounthSp3\": 0,\n  \"PinAddress1\": \"string\",\n  \"PinAddress2\": \"string\",\n  \"PinAddress3\": \"string\",\n  \"PinAddress4\": \"string\",\n  \"PinAddress5\": \"string\",\n  \"PinAddress6\": \"string\",\n  \"PinCountry\": \"Poland\",\n  \"PinMethod\": \"S\",\n  \"PinName\": \"string\",\n  \"ShipmentDate\": \"2020-01-01T00:00:00.000Z\",\n  \"SIR\": \"XXXXXXXXXXXXXXXX\",\n  \"ValidFromDate\": \"2019-12-01T00:00:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/payments/cards",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"cards"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "search card histories",
+					"item": [
+						{
+							"name": "search card histories",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/history",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"history"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search card histories with query",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/history?page=3&per_page=20&AccountNo=1111111",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"history"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "3"
+										},
+										{
+											"key": "per_page",
+											"value": "20"
+										},
+										{
+											"key": "AccountNo",
+											"value": "1111111"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search card histories 400 invalid query",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/history?page=3&per_page=20&AccountNo=1111111&CardNo=111111111111111111111",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"history"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "3"
+										},
+										{
+											"key": "per_page",
+											"value": "20"
+										},
+										{
+											"key": "AccountNo",
+											"value": "1111111"
+										},
+										{
+											"key": "CardNo",
+											"value": "111111111111111111111"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search card histories 401 missing tenant",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/history",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"history"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search card histories 401 missing jwt token",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/history",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"history"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search card histories 401 no user with given email and tenant",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/history",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"history"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search card histories 401 invalid token",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{invalid_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/history",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"history"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search card histories 401 expired token",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{expired_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/history",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"history"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search card histories 401 invalid jwt token",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "invalid"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/payments/history",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"payments",
+										"history"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "loyaltyRules",
+			"item": [
+				{
+					"name": "create rule",
+					"item": [
+						{
+							"name": "create rule",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"    pm.environment.set(\"rule_id\", pm.response.json()[\"id\"]);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "abcde12345",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation1\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create rule 400 operation no found",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"invalid\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create rule 400 reward is missing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation3\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create rule 400 reward is not a number",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation3\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": \"abcde\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create rule 400 rule is incorrect",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation1\",\n  \"rule\": {\n     \"conditions\": {\n        \"invalid\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create rule 400 rule is not an object",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "abcde12345",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation1\",\n  \"rule\": \"invalid\",\n  \"reward\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create rule 401 invalid token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{invalid_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation1\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create rule 401 invalid token Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{expired_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation1\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create rule 401 no user with given email and tenant",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation1\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create rule 403 not admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation1\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "put rule",
+					"item": [
+						{
+							"name": "put rule",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "abcde12345",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation2\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }, {\n          \"fact\": \"amount\",\n           \"operator\": \"lessThanInclusive\",\n           \"value\": 200\n        }\n        ]\n     }\n  },\n  \"reward\": 200\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "put rule 400",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "put rule 401",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation1\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "put rule 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation1\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "put rule 404",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "abcde12345",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation2\",\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }, {\n          \"fact\": \"amount\",\n           \"operator\": \"lessThanInclusive\",\n           \"value\": 200\n        }\n        ]\n     }\n  },\n  \"reward\": 200\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/10000000000000",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"10000000000000"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "patch rule",
+					"item": [
+						{
+							"name": "patch rule 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"reward\": 300\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "patch rule 2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"operation\": \"operation3\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "patch rule 3",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"rule\": {\n     \"conditions\": {\n        \"all\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 500\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "patch rule 400 invalid rule",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"rule\": {\n     \"conditions\": {\n        \"invalid\": [{\n          \"fact\": \"amount\",\n           \"operator\": \"greaterThanInclusive\",\n           \"value\": 100\n        }]\n     }\n  },\n  \"reward\": 500\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "patch rule 401",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"reward\": 300\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "patch rule 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"reward\": 300\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "patch rule 404",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e801a774-17c1-42b2-9c1a-78f0de7c4e4f",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"reward\": 300\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/10000000000000",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"10000000000000"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "search rules",
+					"item": [
+						{
+							"name": "search rules",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search rules with query",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules?page=2&per_page=3",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "2"
+										},
+										{
+											"key": "per_page",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search rules 400",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules?page=invalid",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "invalid"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search rules 401",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{expired_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search rules 403",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "get rule",
+					"item": [
+						{
+							"name": "get rule",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "abcde12345",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get rule 400",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/invalid",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"invalid"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get rule 401",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get rule 403",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get rule 404",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/10000000000000",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"10000000000000"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "delete rule",
+					"item": [
+						{
+							"name": "delete rule",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete rule 400",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/invalid",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"invalid"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete rule 401",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete rule 403",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/{{rule_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"{{rule_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete rule 404",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/rules/10000000000000",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"rules",
+										"10000000000000"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "loyaltyPoints",
+			"item": [
+				{
+					"name": "create transaction",
+					"item": [
+						{
+							"name": "create transaction 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2bd2c92f-51c4-4bb2-81ad-13f5fb65e088",
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"    pm.environment.set(\"transaction_id\", pm.response.json()[\"id\"]);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "abcde12345",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"userId\": 20000,\n\t\"ruleId\": 10000,\n\t\"amount\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create transaction 2",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"userId\": 20001,\n\t\"amount\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create transaction 400 user not found",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2bd2c92f-51c4-4bb2-81ad-13f5fb65e088",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"userId\": 2000000,\n\t\"ruleId\": 10000,\n\t\"amount\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create transaction 400 rule not found",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2bd2c92f-51c4-4bb2-81ad-13f5fb65e088",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"userId\": 20000,\n\t\"ruleId\": 10000000,\n\t\"amount\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create transaction 400 invalid parameter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2bd2c92f-51c4-4bb2-81ad-13f5fb65e088",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"userId\": 20000,\n\t\"ruleId\": \"abcde\",\n\t\"amount\": -10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create transaction 401",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2bd2c92f-51c4-4bb2-81ad-13f5fb65e088",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"userId\": 20000,\n\t\"ruleId\": 10000,\n\t\"amount\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create transaction 403",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2bd2c92f-51c4-4bb2-81ad-13f5fb65e088",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"userId\": 20000,\n\t\"ruleId\": 10000,\n\t\"amount\": 100\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "get transaction",
+					"item": [
+						{
+							"name": "get transaction",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "abcde12345",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/points/{{transaction_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"{{transaction_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get transaction 400",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/points/abcde",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"abcde"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get transaction 401",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/points/{{transaction_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"{{transaction_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get transaction 403",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/points/{{transaction_id}}",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"{{transaction_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get transaction 404",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/points/100000000000",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"100000000000"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "buy points",
+					"item": [
+						{
+							"name": "buy points by normal user",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"points\": 50\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points/buy",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"buy"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "buy points by admin",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"points\": 30\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points/buy",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"buy"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "buy points 400 points is negative",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"points\": -10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points/buy",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"buy"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "buy points 400 invalid points",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"points\": \"invalid\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points/buy",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"buy"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "buy points 401",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"points\": 50\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points/buy",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"buy"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "redeem points",
+					"item": [
+						{
+							"name": "redeem points by normal user",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"points\": 15\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points/redeem",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"redeem"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "redeem points by admin",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"points\": 50\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points/redeem",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"redeem"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "redeem points 400 not enough",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"points\": 1000\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points/redeem",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"redeem"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "redeem points 400 points is negative",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"points\": -10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points/redeem",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"redeem"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "redeem points 400 invalid points",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"points\": \"invalid\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points/redeem",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"redeem"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "redeem points 401",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{invalid_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"points\": 50\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/loyalty/points/redeem",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points",
+										"redeem"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "search transactions",
+					"item": [
+						{
+							"name": "search transactions",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "abcde12345",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/points",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search transactions with query",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/points?page=2&per_page=2",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "2"
+										},
+										{
+											"key": "per_page",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search transactions 400",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "abcde12345"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/points?page=abc",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "abc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search transactions 401",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"value": "12345abcde",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/points",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "search transactions 403",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{new_user_token}}"
+									},
+									{
+										"key": "X-Tenant-Id",
+										"type": "text",
+										"value": "12345abcde"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/loyalty/points",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"loyalty",
+										"points"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

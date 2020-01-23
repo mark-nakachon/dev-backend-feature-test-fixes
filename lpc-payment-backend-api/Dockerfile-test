@@ -1,0 +1,17 @@
+FROM node:alpine as builder
+RUN mkdir -p /app
+WORKDIR /app
+COPY . /app
+RUN npm ci && npm run prebuild && npm run build
+
+FROM alpine:latest
+WORKDIR /app
+RUN apk add nodejs npm yarn
+ENV NODE_CONFIG_DIR=/app/config/
+ENV NODE_ENV=test
+COPY --from=builder /app/*.json /app/
+COPY --from=builder /app/dist/ /app/dist/
+COPY --from=builder /app/config/ /app/config/
+RUN npm ci --production --remove-dev
+EXPOSE 8080
+ENTRYPOINT ["npm", "run", "start"]

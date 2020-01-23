@@ -1,0 +1,39 @@
+{
+  "name": "soap-api",
+  "version": "2.0.1",
+  "description": "SOAP decorators for creating wsdl's and annotating services to provide metadata for node-soap",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/app.js",
+    "build": "tsc"
+  },
+  "author": "",
+  "dependencies": {
+    "@types/reflect-metadata": "0.0.5",
+    "@types/soap": "0.21.0",
+    "dummy-json": "^2.0.0",
+    "es6-shim": "0.35.2",
+    "express": "^4.17.1",
+    "express-soap": "1.1.1",
+    "lodash": "^4.17.15",
+    "reflect-metadata": "0.1.12",
+    "soap": "0.24.0",
+    "soap-decorators": "^2.0.1",
+    "xml-decorators": "1.0.5",
+    "xml2js": "0.4.17",
+    "xsd-decorators": "1.0.2"
+  },
+  "devDependencies": {
+    "@types/chai": "3.4.34",
+    "@types/express": "4.0.35",
+    "@types/mocha": "2.2.33",
+    "@types/supertest": "2.0.0",
+    "@types/xml2js": "0.0.32",
+    "@types/xml2json": "0.10.0",
+    "chai": "3.5.0",
+    "mocha": "3.2.0",
+    "supertest": "3.0.0",
+    "tslint": "4.4.2",
+    "typescript": "2.1.5"
+  }
+}

@@ -1,0 +1,9 @@
+version: '3'
+services:
+  mocked-soap-api:
+    container_name: mockedSoapApi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3100:3100'

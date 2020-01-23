@@ -1,0 +1,14 @@
+UserPoolId=eu-west-1_yUndkWSLQ
+ClientId=17rad1g5euri2fji3cb7tqfcm5
+PORT=8080
+COGNITO_REGION=eu-west-1
+COGNITO_USER_POOL_ID=eu-west-1_yUndkWSLQ
+TOKEN_USE=access
+SOAP_URL=http://lpc-backend-api-mock:8080/payment?wsdl
+DB_DIALECT=postgres
+DB_HOST=postgresql.db.easyuse.dev
+DB_PORT=5432
+DB_USERNAME=dev
+DB_PASSWORD=5CcgPCeUb6JxEKiV8tdT1wYqN1q4yGSHe3zB0cb7Gpktfy2xd9IC4pe5Oys6iPwE
+DB_DATABASE=developers-portal
+TENANT_ID=62e287f1-8e47-4948-8056-a52a7393d19c
